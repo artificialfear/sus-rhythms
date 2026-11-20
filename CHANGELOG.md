@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.3 — 2026-11-20
+- Home title is now centered on the page. It used to sit off to the right on wide screens.
+
 ## 1.0.2 — 2026-11-20
 - Home title is now level (no tilt). The bounce animation is unchanged.
 
