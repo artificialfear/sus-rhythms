@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sus Rhythms · Raven Band Edition</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23bfe3ff' fill-opacity='.35' stroke='%23fff' stroke-width='4'/%3E%3Ccircle cx='48' cy='54' r='28' fill='%23111'/%3E%3Cpolygon points='68,50 96,58 68,66' fill='%23555'/%3E%3Ccircle cx='56' cy='48' r='6' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#070b1a; --bg2:#0e1530; --panel:#141d3d; --panel2:#1b2650; --line:rgba(255,255,255,.14);
+  --text:#eef2ff; --muted:#9aa6cc; --gold:#f5c542; --navy:#1d2c6b; --red:#e5343a; --red2:#a3161b;
+  --green:#3ccf7a; --card:#ffffff; --ink:#111111; --accent:#59c3ff;
+}
+body.light{
+  --bg:#e9eefb; --bg2:#dfe6f7; --panel:#ffffff; --panel2:#f1f4fc; --line:rgba(20,30,70,.16);
+  --text:#121a36; --muted:#56608a; --accent:#1769c2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+body:not(.light){background-image:radial-gradient(rgba(255,255,255,.55) 1px,transparent 1.5px),radial-gradient(rgba(255,255,255,.25) 1px,transparent 1.5px);background-size:140px 140px,60px 60px;background-position:0 0,30px 40px}
+h1,h2,h3{margin:0 0 .4em;font-family:"Trebuchet MS","Arial Rounded MT Bold","Segoe UI",sans-serif;letter-spacing:.5px}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}
+input,select,textarea{font:inherit;color:var(--text);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:.5em .7em}
+textarea{width:100%;resize:vertical}
+.btn{display:inline-block;background:#26346f;background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:.6em 1.1em;margin:4px;font-weight:700;line-height:1.2}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:#d9a514;background:var(--gold);color:#1a1300;border-color:#d9a514}
+.btn.danger{background:#e5343a;background:var(--red);color:#fff;border-color:#a3161b}
+.btn.small{padding:.35em .7em;font-size:.9em;border-radius:10px}
+.btn.big{font-size:1.35em;padding:.7em 1.4em}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(245,197,66,.35) inset}
+.muted{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;align-items:center}
+.row > *{margin:4px}
+.center{text-align:center}
+.screen{display:none;min-height:100vh;padding:18px 22px 30px}
+.screen.active{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin:10px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;grid-gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);grid-gap:12px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+label.f{display:block;margin:8px 0 2px;font-weight:600;font-size:.92em}
+.num{width:5.5em}
+.topbar{position:fixed;top:10px;right:12px;z-index:50}
+.topbar .btn{margin:0 0 0 6px;padding:.35em .6em;border-radius:10px}
+/* ---------- home ---------- */
+.hero{max-width:980px;margin:4vh auto 0;text-align:center}
+.title{font-size:clamp(2.4rem,7vw,5.2rem);font-weight:900;line-height:1;margin:.2em 0 .1em;font-family:"Trebuchet MS","Arial Rounded MT Bold",sans-serif;letter-spacing:2px;text-shadow:0 4px 0 rgba(0,0,0,.35)}
+.title .r{color:var(--red)}
+.subtitle{color:var(--gold);font-weight:800;letter-spacing:3px;text-transform:uppercase}
+.crew-line{margin:14px auto 6px;height:150px;white-space:nowrap;overflow:hidden}
+.crew-line svg{height:140px;width:auto;margin:0 -6px;vertical-align:bottom}
+.bob{animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+/* ---------- setup ---------- */
+.wrap{max-width:1180px;margin:0 auto}
+.chips{display:flex;flex-wrap:wrap}
+.chip{border:2px solid var(--line);background:var(--panel2);border-radius:999px;padding:.3em .8em;margin:3px;font-weight:600}
+.chip.off{opacity:.4;text-decoration:line-through}
+.chip.sel{border-color:var(--gold)}
+.warn{color:#ffb4b4;font-weight:600}
+body.light .warn{color:#b0141a}
+/* ---------- HUD ---------- */
+.hud{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:0 0 10px;padding-right:150px}
+.hud .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.35em .8em;margin:3px 6px 3px 0;font-weight:700}
+.hud .stat b{color:var(--gold)}
+/* ---------- lobby ---------- */
+.codebox{font-size:clamp(2.6rem,7vw,6rem);font-weight:900;letter-spacing:.12em;color:var(--gold);font-family:Consolas,"Courier New",monospace;line-height:1}
+.qr{background:#fff;border-radius:12px;padding:8px;display:inline-block;width:190px}
+.qr svg{width:100%;height:auto;display:block}
+.roster{columns:4 170px;column-gap:16px;font-size:1.12em}
+.roster div{break-inside:avoid;padding:3px 0}
+.roster b{display:inline-block;min-width:2.1em;color:var(--gold)}
+.roster .out{opacity:.4;text-decoration:line-through}
+/* ---------- rules ---------- */
+.rules{max-width:1100px;margin:0 auto}
+.rules h2{font-size:clamp(1.8rem,4vw,3rem);color:var(--gold)}
+.rules ol{font-size:clamp(1.1rem,2.2vw,1.65rem);line-height:1.45}
+.rules li{margin:.25em 0}
+.rulefig{float:right;width:min(26%,240px);margin:0 0 10px 20px}
+.dots{text-align:center;margin-top:10px}
+.dots span{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--line);margin:0 4px}
+.dots span.on{background:var(--gold)}
+/* ---------- rhythm ---------- */
+.rh-head{display:flex;align-items:baseline;flex-wrap:wrap}
+.rh-head h1{font-size:clamp(2rem,4.5vw,3.4rem);margin-right:16px}
+.notation{background:#fff;color:#111;border-radius:16px;padding:22px 18px 12px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.notation svg{width:100%;height:auto;display:block;max-height:calc(100vh - 320px);margin:0 auto}
+.screen#editor .notation svg{max-height:none}
+.notation .vf-stavenote.now path,.notation .vf-stavenote.now{fill:#e5343a !important;stroke:#e5343a !important}
+.notation text.cnt{font-family:Arial,Helvetica,sans-serif;font-weight:700;fill:#1d2c6b}
+.notation text.cnt.now{fill:#e5343a}
+.notation .err{color:#b0141a;font-weight:700;padding:20px}
+.countin{position:absolute;left:0;right:0;top:0;bottom:0;display:none;align-items:center;justify-content:center;font-size:clamp(5rem,16vw,12rem);font-weight:900;color:#e5343a;background:rgba(255,255,255,.82);border-radius:16px}
+.countin.show{display:flex}
+.rh-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:14px}
+.passes{font-size:1.35em;font-weight:800;color:var(--gold);min-width:9em}
+.tempo{display:flex;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:2px 6px;margin:4px}
+.tempo b{min-width:5.2em;text-align:center;display:inline-block}
+.emerg{background:#e5343a;color:#fff;border:3px solid #ffd2d2;border-radius:50%;width:150px;height:150px;font-weight:900;font-size:1.05em;line-height:1.15;box-shadow:0 8px 0 #a3161b,0 0 30px rgba(229,52,58,.55);text-transform:uppercase}
+.emerg:active{transform:translateY(5px);box-shadow:0 3px 0 #a3161b}
+.emerg.pulse{animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 8px 0 #a3161b,0 0 0 0 rgba(229,52,58,.7)}50%{box-shadow:0 8px 0 #a3161b,0 0 0 22px rgba(229,52,58,0)}}
+.rh-layout{display:grid;grid-template-columns:1fr 170px;grid-gap:16px;align-items:start}
+@media (max-width:900px){.rh-layout{grid-template-columns:1fr}.emerg{width:120px;height:120px}}
+/* ---------- emergency ---------- */
+.alarm{position:fixed;left:0;top:0;right:0;bottom:0;z-index:80;display:none;align-items:center;justify-content:center;overflow:hidden;background:#5a0004}
+.alarm.show{display:flex}
+.alarm .stripes{position:absolute;left:-50%;top:-50%;width:200%;height:200%;background:repeating-linear-gradient(-28deg,#e5343a 0,#e5343a 70px,#7a0006 70px,#7a0006 140px);animation:slide 1.2s linear infinite;opacity:.85}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(160px)}}
+.alarm .flash{position:absolute;left:0;top:0;right:0;bottom:0;background:#fff;animation:flash .5s ease-out 1}
+@keyframes flash{from{opacity:.9}to{opacity:0}}
+.alarm .msg{position:relative;text-align:center;color:#fff;font-weight:900;font-size:clamp(3rem,11vw,9rem);line-height:.95;letter-spacing:4px;text-shadow:0 6px 0 #4a0003,0 0 40px rgba(0,0,0,.6);animation:shake .35s linear infinite;font-family:"Trebuchet MS","Arial Rounded MT Bold",sans-serif}
+.alarm .who{font-size:.32em;letter-spacing:2px;margin-top:.5em;color:#ffe3a1}
+@keyframes shake{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(4px,-3px) rotate(.6deg)}50%{transform:translate(-3px,3px) rotate(-.6deg)}75%{transform:translate(3px,2px) rotate(.3deg)}100%{transform:translate(0,0)}}
+.alarm .bell{width:min(26vw,220px);margin:0 auto 10px;display:block}
+.sus-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-gap:8px}
+.pbtn{background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:.55em .5em;font-weight:700;text-align:left;font-size:1.05em;position:relative}
+.pbtn .no{color:var(--gold);margin-right:.35em}
+.pbtn.sel{border-color:var(--gold);background:rgba(245,197,66,.18)}
+.pbtn .tag{position:absolute;right:8px;top:6px;background:var(--gold);color:#1a1300;border-radius:8px;padding:0 .45em;font-weight:900}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));grid-gap:14px;margin:14px 0}
+.scard{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:14px;text-align:center;position:relative}
+.scard .hand{font-size:2.6em;line-height:1;margin:4px 0}
+.scard .letter{font-size:1.1em;font-weight:900;color:var(--gold);letter-spacing:2px}
+.scard .nm{font-size:1.6em;font-weight:800;margin:6px 0}
+.scard svg.av{width:90px;height:auto}
+.scard .tally{display:flex;align-items:center;justify-content:center;margin-top:8px}
+.scard .tally b{font-size:2.2em;min-width:1.6em}
+.scard .tally .btn{font-size:1.4em;width:2em;padding:.2em 0}
+.scard.lead{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,66,.35)}
+.bigtimer{font-size:clamp(4rem,12vw,9rem);font-weight:900;text-align:center;line-height:1;color:var(--gold);font-variant-numeric:tabular-nums}
+.bigtimer.hot{color:var(--red)}
+.steptitle{font-size:clamp(1.6rem,3.6vw,2.6rem);font-weight:900;text-align:center;margin:4px 0 6px}
+/* ---------- eject ---------- */
+.eject{position:fixed;left:0;top:0;right:0;bottom:0;z-index:70;background:#000;display:none;overflow:hidden}
+.eject.show{display:block}
+.eject .stars{position:absolute;left:0;top:0;width:300%;height:100%;background-image:radial-gradient(#fff 1px,transparent 1.6px),radial-gradient(rgba(255,255,255,.6) 1px,transparent 1.6px);background-size:120px 120px,50px 50px;animation:drift 18s linear infinite}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-33.33%)}}
+.eject .floater{position:absolute;top:30%;left:-20%;width:min(22vw,200px);animation:float 7s linear forwards}
+@keyframes float{from{left:-20%;transform:rotate(0)}to{left:115%;transform:rotate(720deg)}}
+.eject .txt{position:absolute;left:0;right:0;top:58%;text-align:center;color:#fff;font-size:clamp(1.6rem,4.4vw,3.6rem);font-weight:800;padding:0 20px}
+.eject .sub{font-size:.6em;color:#c9d2ff;margin-top:.5em;font-weight:700}
+.eject .cont{position:absolute;right:20px;bottom:20px}
+/* ---------- end ---------- */
+.winner{font-size:clamp(2.8rem,9vw,7rem);font-weight:900;text-align:center;line-height:1;margin:.2em 0}
+.winner.crew{color:var(--accent)}
+.winner.imp{color:var(--red)}
+.crew-row{display:flex;flex-wrap:wrap;justify-content:center}
+.crew-row .m{width:120px;text-align:center;margin:6px;font-weight:700}
+.crew-row svg{width:100px;height:auto}
+/* ---------- role page ---------- */
+.role-wrap{max-width:560px;margin:5vh auto 0;text-align:center}
+.role-wrap input{font-size:1.6em;text-align:center;width:100%;letter-spacing:.15em;margin:6px 0}
+.holdbtn{width:100%;font-size:1.4em;padding:1em;border-radius:20px;margin-top:14px;background:#1d2c6b;background:var(--navy);color:#fff;border:3px solid var(--gold);font-weight:900;-webkit-user-select:none;user-select:none;touch-action:none}
+.rolecard{display:none;border-radius:22px;padding:22px;margin-top:16px}
+.rolecard.show{display:block}
+.rolecard.imp{background:#5a0004;border:3px solid var(--red);color:#fff}
+.rolecard.crew{background:#0d2a52;border:3px solid var(--accent);color:#fff}
+.rolecard h2{font-size:2.6em;margin:.1em 0}
+.rolecard svg{width:120px;height:auto}
+/* ---------- editor ---------- */
+.ed{display:grid;grid-template-columns:300px 1fr;grid-gap:14px}
+@media (max-width:900px){.ed{grid-template-columns:1fr}}
+.rlist{max-height:70vh;overflow:auto}
+.ritem{display:block;width:100%;text-align:left;background:var(--panel2);border:2px solid var(--line);border-radius:12px;padding:.45em .7em;margin:0 0 6px}
+.ritem.sel{border-color:var(--gold)}
+.ritem small{display:block;color:var(--muted)}
+code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px solid var(--line)}
+.modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:90;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal .panel{max-width:620px;width:100%;max-height:90vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel);border:2px solid var(--gold);border-radius:12px;padding:.6em 1em;z-index:99;display:none;font-weight:700}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <button class="btn" id="soundBtn" title="Sound on/off">🔊</button>
+  <button class="btn" id="themeBtn" title="Light/dark">🌙</button>
+  <button class="btn" id="menuBtn" title="Menu" style="display:none">☰</button>
+</div>
+
+<!-- ================= HOME ================= -->
+<section class="screen" id="home">
+  <div class="hero">
+    <div class="subtitle">Raven Band Edition</div>
+    <div class="title">SUS <span class="r">RHYTHMS</span></div>
+    <div class="muted" style="font-size:1.15em">Clap the rhythm. Find the imposters. Don't get ejected.</div>
+    <div class="crew-line" id="homeCrew"></div>
+    <div class="row" style="justify-content:center;margin-top:10px">
+      <button class="btn primary big" id="goRole">🔒 Check my secret role</button>
+      <button class="btn big" id="goTeacher">🎛️ Run the game (teacher)</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STUDENT ROLE ================= -->
+<section class="screen" id="role">
+  <div class="role-wrap">
+    <h1>Check your secret role</h1>
+    <p class="muted">Type the game code from the board and your number. Don't let anyone see your screen!</p>
+    <label class="f" for="rCode">Game code</label>
+    <input id="rCode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC-123">
+    <label class="f" for="rNum">Your number</label>
+    <input id="rNum" type="number" inputmode="numeric" min="1" max="63" placeholder="12">
+    <div id="rMsg" class="warn" style="min-height:1.4em;margin-top:6px"></div>
+    <button class="holdbtn" id="holdBtn">Press and HOLD to see your role</button>
+    <div class="rolecard" id="roleCard"></div>
+    <p class="muted" style="margin-top:22px;font-size:.9em">Let go and your role hides again. You can only check one number on this device per game.</p>
+    <button class="btn small" id="roleHome">← Back</button>
+  </div>
+</section>
+
+<!-- ================= SETUP ================= -->
+<section class="screen" id="setup">
+  <div class="wrap">
+    <h1>Sus Rhythms <span class="muted" style="font-size:.55em">· Game setup · v1.0.0</span></h1>
+    <div id="resumeBox"></div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Class</h3>
+        <select id="clsSel" style="width:100%"></select>
+        <label class="f">Roster <span class="muted">(one name per line; saved only on this device)</span></label>
+        <textarea id="roster" rows="6" placeholder="Leave empty to play with numbers only"></textarea>
+        <div class="row"><span class="muted">or no names, just</span><input id="nOnly" type="number" class="num" min="6" max="63" value="25"><span class="muted">students</span></div>
+        <label class="f">Who's here today? <span class="muted">(tap absent students to cross them out)</span></label>
+        <div class="chips" id="present"></div>
+        <div class="muted" id="presentCount" style="margin-top:6px"></div>
+      </div>
+      <div class="panel">
+        <h3>Rules</h3>
+        <div class="grid2" style="grid-gap:4px 14px">
+          <div><label class="f">Imposters</label><input id="sK" type="number" class="num" min="1" max="15"></div>
+          <div><label class="f">Imposters win when crewmates drop below</label><input id="sThr" type="number" class="num" min="1" max="60"></div>
+          <div><label class="f">Suspects per meeting</label><input id="sSus" type="number" class="num" min="2" max="4"></div>
+          <div><label class="f">Defense time (seconds)</label><input id="sDef" type="number" class="num" min="10" max="300" step="5"></div>
+          <div><label class="f">Voting countdown (seconds)</label><input id="sVote" type="number" class="num" min="3" max="30"></div>
+          <div><label class="f">Times through each rhythm</label><input id="sPass" type="number" class="num" min="1" max="4"></div>
+          <div><label class="f">Tempo (BPM)</label><input id="sTempo" type="number" class="num" min="40" max="200" step="2"></div>
+          <div><label class="f">Reveal role when ejected</label><select id="sReveal"><option value="1">Yes</option><option value="0">No (harder)</option></select></div>
+        </div>
+        <div id="ruleWarn" class="warn" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><h3 style="margin:0">Rhythms for this class <span class="muted" id="rhCount" style="font-size:.7em"></span></h3><div><button class="btn small" id="rhAll">All</button><button class="btn small" id="rhNone">None</button><button class="btn small" id="openEditor">✏️ Rhythm editor</button></div></div>
+      <div class="chips" id="rhPick" style="margin-top:6px"></div>
+    </div>
+    <div class="row" style="justify-content:center"><button class="btn primary big" id="startGame">🚀 Start new game</button><button class="btn" id="setupHome">← Home</button></div>
+  </div>
+</section>
+
+<!-- ================= LOBBY ================= -->
+<section class="screen" id="lobby">
+  <div class="wrap">
+    <div class="grid2" style="grid-template-columns:1.1fr 1fr">
+      <div class="panel center">
+        <h2>Check your secret role</h2>
+        <div class="row" style="justify-content:center;align-items:center">
+          <div class="qr" id="qr"></div>
+          <div style="text-align:left;margin-left:14px">
+            <div class="muted">On your iPad, go to</div>
+            <div style="font-weight:800;font-size:1.15em;word-break:break-all" id="joinUrl"></div>
+            <div class="muted" style="margin-top:6px">tap <b>Check my secret role</b> and type</div>
+          </div>
+        </div>
+        <div class="codebox" id="lobbyCode" style="margin-top:10px"></div>
+        <div class="muted" style="margin-top:4px">plus <b>your number</b> from the list →</div>
+      </div>
+      <div class="panel">
+        <h3>Find your number</h3>
+        <div class="roster" id="lobbyRoster"></div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:center"><button class="btn primary big" id="toRules">Rules →</button><button class="btn big" id="skipRules">Skip to Rhythm 1 →</button></div>
+  </div>
+</section>
+
+<!-- ================= RULES ================= -->
+<section class="screen" id="rules">
+  <div class="rules">
+    <div id="ruleSlide"></div>
+    <div class="dots" id="ruleDots"></div>
+    <div class="row" style="justify-content:center;margin-top:10px">
+      <button class="btn" id="rulePrev">← Back</button>
+      <button class="btn primary" id="ruleNext">Next →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RHYTHM ================= -->
+<section class="screen" id="rhythm">
+  <div class="hud" id="hud"></div>
+  <div class="rh-layout">
+    <div>
+      <div class="rh-head"><h1 id="rhTitle">Rhythm 1</h1><span class="muted" id="rhSub"></span></div>
+      <div class="notation"><div id="rhNotation"></div><div class="countin" id="countin"></div></div>
+      <div class="rh-controls">
+        <div class="row">
+          <button class="btn primary big" id="playBtn">▶ Play</button>
+          <div class="tempo"><button class="btn small" id="tDown">−</button><b id="tVal">80 BPM</b><button class="btn small" id="tUp">+</button></div>
+          <button class="btn small" id="cntBtn" title="Show counting under the notes">1 &amp; Counts</button>
+          <button class="btn small" id="clkBtn" title="Metronome click while clapping">🥁 Click</button>
+          <button class="btn small" id="mdlBtn" title="Play the rhythm as a clap sound (covers up mistakes, so off by default)">👏 Model</button>
+        </div>
+        <div class="passes" id="passTxt"></div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="prevRh">← Previous rhythm</button>
+        <button class="btn" id="nextRh">Next rhythm →</button>
+      </div>
+    </div>
+    <div class="center">
+      <button class="emerg" id="emergBtn">Emergency<br>Meeting</button>
+      <div class="muted" style="margin-top:10px;font-size:.9em">Space = play/stop<br>E = emergency</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MEETING ================= -->
+<section class="screen" id="meeting">
+  <div class="hud" id="hud2"></div>
+  <div class="wrap" id="meetBody"></div>
+</section>
+
+<!-- ================= END ================= -->
+<section class="screen" id="end">
+  <div class="wrap center" id="endBody"></div>
+</section>
+
+<!-- ================= EDITOR ================= -->
+<section class="screen" id="editor">
+  <div class="wrap">
+    <div class="row" style="justify-content:space-between"><h1 style="margin:0">Rhythm editor</h1><button class="btn primary" id="edDone">✓ Done</button></div>
+    <div class="ed">
+      <div class="panel">
+        <div class="row"><button class="btn small" id="edNew">+ New</button><button class="btn small" id="edDup">Duplicate</button><button class="btn small" id="edUp">↑</button><button class="btn small" id="edDown">↓</button></div>
+        <div class="rlist" id="edList"></div>
+        <div class="row" style="margin-top:8px"><button class="btn small" id="edExport">Export</button><button class="btn small" id="edImport">Import</button><button class="btn small" id="edReset">Restore defaults</button></div>
+      </div>
+      <div class="panel">
+        <div class="grid3" style="grid-template-columns:2fr 1.4fr 1fr">
+          <div><label class="f">Name</label><input id="edName" style="width:100%"></div>
+          <div><label class="f">Tag / set</label><input id="edTag" style="width:100%" list="tagList"><datalist id="tagList"></datalist></div>
+          <div><label class="f">Time</label><select id="edTime"><option>4/4</option><option>3/4</option><option>2/4</option></select></div>
+        </div>
+        <label class="f">Rhythm</label>
+        <textarea id="edPat" rows="3" spellcheck="false" style="font-family:Consolas,'Courier New',monospace;font-size:1.15em"></textarea>
+        <div class="muted" style="font-size:.92em;margin:4px 0 10px">
+          <code class="k">w</code> whole · <code class="k">h</code> half · <code class="k">q</code> quarter · <code class="k">e</code> eighth · <code class="k">s</code> sixteenth ·
+          add <code class="k">.</code> for dotted (<code class="k">q.</code>) · add <code class="k">r</code> for a rest (<code class="k">qr</code>) · <code class="k">|</code> barlines are optional but get checked.
+          Eighths and sixteenths beam by beat automatically.
+        </div>
+        <div id="edErr" class="warn"></div>
+        <div class="notation"><div id="edPrev"></div></div>
+        <div class="row" style="margin-top:10px;justify-content:space-between"><button class="btn small" id="edPlay">▶ Preview</button><button class="btn small danger" id="edDel">Delete</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="alarm" id="alarm"><div class="stripes"></div><div class="flash"></div><div class="msg"><div id="bellSvg"></div>EMERGENCY<br>MEETING<div class="who" id="alarmWho"></div></div></div>
+<div class="eject" id="eject"><div class="stars"></div><div class="floater" id="floater"></div><div class="txt" id="ejectTxt"></div><div class="cont"><button class="btn primary big" id="ejectGo" style="display:none">Continue →</button></div></div>
+
+<div class="modal" id="menu"><div class="panel">
+  <h2>Menu</h2>
+  <div class="row"><button class="btn" data-m="rules">📜 Rules</button><button class="btn" data-m="lobby">🔑 Game code &amp; numbers</button><button class="btn" data-m="rhythm">🎵 Back to rhythm</button></div>
+  <div class="row"><button class="btn" data-m="undo">↶ Undo last ejection</button><button class="btn" data-m="end">🏁 End game &amp; reveal</button><button class="btn" data-m="setup">⚙️ Setup</button></div>
+  <div class="panel" style="background:var(--bg2)">
+    <b>Teacher peek</b> <span class="muted">— press and hold to see the imposters. Point the projector away first!</span>
+    <div class="row"><button class="btn danger small" id="peekBtn" style="touch-action:none">Hold to peek</button><span id="peekOut" style="font-weight:800"></span></div>
+  </div>
+  <div class="row" style="justify-content:flex-end"><button class="btn primary" data-m="close">Close</button></div>
+</div></div>
+
+<div class="modal" id="ioModal"><div class="panel">
+  <h3 id="ioTitle">Export</h3>
+  <textarea id="ioText" rows="12" spellcheck="false" style="font-family:Consolas,monospace;font-size:.85em"></textarea>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="ioCopy">Copy</button><button class="btn primary" id="ioOk">Close</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="lib/vexflow-bravura.js?v=4.2.3"></script>
+<script src="lib/qrcode.js?v=1"></script>
+<script>
+(function(){
+"use strict";
+var VERSION = "1.0.0";
+var APP_URL = "https://artificialfear.github.io/sus-rhythms/";
+
+/* ======================= helpers ======================= */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function load(k, d){ try{ var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } }
+function save(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function toast(msg){ var t = $("toast"); t.textContent = msg; t.className = "toast show"; clearTimeout(toast._t); toast._t = setTimeout(function(){ t.className = "toast"; }, 2200); }
+function show(id){
+  var s = document.querySelectorAll(".screen");
+  for (var i = 0; i < s.length; i++) s[i].classList.remove("active");
+  $(id).classList.add("active");
+  $("menuBtn").style.display = (G && !G.over && ["rhythm","meeting","lobby","rules"].indexOf(id) >= 0) ? "" : "none";
+  window.scrollTo(0,0);
+  current = id;
+}
+var current = "home";
+
+/* ======================= art (original raven crew) ======================= */
+var SUITS = ["#e5343a","#3b82f6","#22c55e","#f5c542","#a855f7","#f97316","#ec4899","#14b8a6","#eeeeee","#8b5a2b","#64748b","#84cc16"];
+function shade(hex, f){
+  var n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  r = Math.round(r * f); g = Math.round(g * f); b = Math.round(b * f);
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+function raven(color, opt){
+  opt = opt || {};
+  var c = color || SUITS[0], d = shade(c, .68);
+  var x = opt.cross ? '<g stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="58" y1="44" x2="66" y2="52"/><line x1="66" y1="44" x2="58" y2="52"/></g>' :
+    '<circle cx="62" cy="48" r="6" fill="#fff"/><circle cx="64" cy="48" r="3" fill="#111"/><circle cx="65" cy="47" r="1" fill="#fff"/>';
+  return '<svg class="' + (opt.cls || "") + '" viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">' +
+    // legs
+    '<rect x="38" y="112" width="18" height="30" rx="8" fill="' + d + '"/><rect x="64" y="112" width="18" height="30" rx="8" fill="' + d + '"/>' +
+    '<rect x="34" y="134" width="24" height="10" rx="5" fill="#2b2b2b"/><rect x="62" y="134" width="24" height="10" rx="5" fill="#2b2b2b"/>' +
+    // arms
+    '<rect x="16" y="78" width="16" height="36" rx="8" fill="' + d + '" transform="rotate(12 24 80)"/><rect x="88" y="78" width="16" height="36" rx="8" fill="' + d + '" transform="rotate(-12 96 80)"/>' +
+    // torso
+    '<rect x="28" y="72" width="64" height="52" rx="18" fill="' + c + '"/>' +
+    '<rect x="44" y="88" width="32" height="18" rx="4" fill="' + d + '"/><circle cx="52" cy="97" r="3" fill="#7CFC9A"/><circle cx="62" cy="97" r="3" fill="#ffd34d"/><circle cx="70" cy="97" r="2" fill="#ff6b6b"/>' +
+    // collar ring
+    '<ellipse cx="60" cy="74" rx="34" ry="8" fill="#b9c2d6" stroke="#7c86a0" stroke-width="2"/>' +
+    // raven head
+    '<path d="M44 34 L48 20 L54 30 L58 16 L62 30 Z" fill="#111"/>' +
+    '<circle cx="56" cy="48" r="22" fill="#151515"/>' +
+    '<path d="M74 42 L102 51 L74 58 Z" fill="#3a3a3a"/><path d="M74 50 L102 51 L74 58 Z" fill="#262626"/>' +
+    x +
+    // helmet
+    '<circle cx="60" cy="44" r="36" fill="rgba(180,220,255,.22)" stroke="rgba(255,255,255,.85)" stroke-width="3"/>' +
+    '<path d="M34 30 A30 30 0 0 1 56 12" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="5" stroke-linecap="round"/>' +
+    '</svg>';
+}
+function bellArt(){
+  return '<svg class="bell" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">' +
+    '<ellipse cx="100" cy="122" rx="92" ry="16" fill="#3a0003"/>' +
+    '<rect x="20" y="96" width="160" height="26" rx="8" fill="#2b2f3a"/>' +
+    '<rect x="40" y="70" width="120" height="34" rx="10" fill="#4a5162"/>' +
+    '<ellipse cx="100" cy="70" rx="54" ry="16" fill="#c4000a"/><path d="M46 70 Q100 0 154 70 Z" fill="#ff2a2a"/>' +
+    '<path d="M70 44 Q86 22 104 22" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" opacity=".7"/>' +
+    '<g stroke="#ffe066" stroke-width="7" stroke-linecap="round"><line x1="20" y1="30" x2="38" y2="44"/><line x1="180" y1="30" x2="162" y2="44"/><line x1="100" y1="2" x2="100" y2="12"/></g>' +
+    '</svg>';
+}
+function colorFor(no){ return SUITS[(no - 1) % SUITS.length]; }
+
+/* ======================= sound ======================= */
+var AC = null, soundOn = load("sus.sound", true);
+function ac(){ if (!AC){ var C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } if (AC && AC.state === "suspended") AC.resume(); return AC; }
+function tone(freq, t, dur, type, vol, dest){
+  var a = ac(); if (!a) return;
+  var o = a.createOscillator(), g = a.createGain();
+  o.type = type || "sine"; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || .3, t + .005); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(dest || a.destination); o.start(t); o.stop(t + dur + .05);
+}
+var noiseBuf = null;
+function noise(t, dur, vol, fq, dest){
+  var a = ac(); if (!a) return;
+  if (!noiseBuf){ noiseBuf = a.createBuffer(1, a.sampleRate * 1, a.sampleRate); var ch = noiseBuf.getChannelData(0); for (var i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1; }
+  var s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+  s.buffer = noiseBuf; f.type = "bandpass"; f.frequency.value = fq || 1500; f.Q.value = 1.2;
+  g.gain.setValueAtTime(vol || .6, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(dest || a.destination); s.start(t); s.stop(t + dur + .02);
+}
+function sfx(name){
+  if (!soundOn) return; var a = ac(); if (!a) return; var t = a.currentTime + .02, i;
+  if (name === "siren"){
+    var o = a.createOscillator(), g = a.createGain(); o.type = "sawtooth";
+    for (i = 0; i < 6; i++){ o.frequency.setValueAtTime(620, t + i * .45); o.frequency.linearRampToValueAtTime(980, t + i * .45 + .3); }
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .05); g.gain.setValueAtTime(.12, t + 2.5); g.gain.exponentialRampToValueAtTime(.0001, t + 2.8);
+    o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + 2.9);
+  } else if (name === "beep"){ tone(880, t, .15, "square", .08); }
+  else if (name === "close"){ tone(523, t, .2, "square", .1); tone(392, t + .18, .35, "square", .1); }
+  else if (name === "whoosh"){ noise(t, 1.6, .5, 500); noise(t + .2, 1.4, .3, 250); }
+  else if (name === "imp"){ tone(196, t, .5, "sawtooth", .15); tone(185, t + .45, .9, "sawtooth", .15); }
+  else if (name === "crew"){ tone(523, t, .18, "triangle", .25); tone(659, t + .16, .18, "triangle", .25); tone(784, t + .32, .4, "triangle", .25); }
+  else if (name === "win"){ [523,659,784,1047].forEach(function(f, k){ tone(f, t + k * .15, .35, "triangle", .25); }); }
+  else if (name === "tap"){ tone(660, t, .06, "sine", .15); }
+}
+
+/* ======================= game codes & roles ======================= */
+// 6 chars from a 32-symbol alphabet = 30 bits: seed(15) | n(6) | k(4) | check(5)
+var ALPH = "123456789ABCDEFGHJKMNPQRSTUVWXYZ";
+function chk(seed, n, k){ var h = (seed * 2654435761 + n * 40503 + k * 977) >>> 0; h ^= h >>> 13; h = (h * 2246822519) >>> 0; return (h ^ (h >>> 16)) & 31; }
+function encodeCode(seed, n, k){
+  var v = ((seed * 64 + n) * 16 + k) * 32 + chk(seed, n, k), s = "";
+  for (var i = 0; i < 6; i++){ s = ALPH[v % 32] + s; v = Math.floor(v / 32); }
+  return s;
+}
+function cleanCode(s){ return String(s || "").toUpperCase().replace(/[IL]/g, "1").replace(/[^0-9A-Z]/g, ""); }
+function decodeCode(s){
+  s = cleanCode(s); if (s.length !== 6) return null;
+  var v = 0;
+  for (var i = 0; i < 6; i++){ var d = ALPH.indexOf(s[i]); if (d < 0) return null; v = v * 32 + d; }
+  var c = v % 32; v = Math.floor(v / 32); var k = v % 16; v = Math.floor(v / 16); var n = v % 64; var seed = Math.floor(v / 64);
+  if (chk(seed, n, k) !== c || n < 2 || k < 1 || k >= n) return null;
+  return {seed: seed, n: n, k: k};
+}
+function fmtCode(s){ return s.slice(0, 3) + "-" + s.slice(3); }
+function rng(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function imposters(seed, n, k){
+  var r = rng(seed * 7919 + n * 131 + k), a = [], i;
+  for (i = 1; i <= n; i++) a.push(i);
+  for (i = n - 1; i > 0; i--){ var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a.slice(0, k).sort(function(x, y){ return x - y; });
+}
+
+/* ======================= rhythms ======================= */
+var DEFAULT_RHYTHMS = [
+  {id:"r1",  name:"Rhythm 1",  tag:"Original 10", time:"4/4", pattern:"q q e e q | e e e e e e q | e e q e e q | e e e e q q"},
+  {id:"r2",  name:"Rhythm 2",  tag:"Original 10", time:"4/4", pattern:"q e e q e e | q q q qr | e e e e e e q | q q q qr"},
+  {id:"r3",  name:"Rhythm 3",  tag:"Original 10", time:"4/4", pattern:"q q q q | e e q e e q | q qr q qr | e e e e q q"},
+  {id:"r4",  name:"Rhythm 4",  tag:"Original 10", time:"4/4", pattern:"e e e e e e q | e e q e e q | e e e e e e e e | e e e e q qr"},
+  {id:"r5",  name:"Rhythm 5",  tag:"Original 10", time:"4/4", pattern:"q q q q | h h | q q q q | w"},
+  {id:"r6",  name:"Rhythm 6",  tag:"Original 10", time:"4/4", pattern:"e e e e e e q | e e e e q q | e e e e e e q | e e e e q q"},
+  {id:"r7",  name:"Rhythm 7",  tag:"Original 10", time:"4/4", pattern:"q qr qr q | q qr q qr | qr qr qr qr | q qr q q"},
+  {id:"r8",  name:"Rhythm 8",  tag:"Original 10", time:"4/4", pattern:"q e e q e e | q q q q | q e e q e e | q q e e q"},
+  {id:"r9",  name:"Rhythm 9",  tag:"Original 10", time:"4/4", pattern:"e e e e e e q | q e e e e q | e e e e e e q | q e e q q"},
+  {id:"r10", name:"Rhythm 10", tag:"Original 10", time:"4/4", pattern:"q e e q qr | e e e e q qr | q qr e e e e | q e e q qr"},
+  {id:"a1",  name:"Dotted & Syncopated", tag:"Advanced", time:"4/4", pattern:"q. e q q | e e q. e q | q e q e q | h h"},
+  {id:"a2",  name:"Sixteenth Shuffle",   tag:"Advanced", time:"4/4", pattern:"s s s s q e e q | s s e q s s s s q | e s s q e s s q | s s s s s s s s q qr"},
+  {id:"a3",  name:"Off the Beat",        tag:"Advanced", time:"4/4", pattern:"e q e q q | e q e qr q | q. e e q e | w"},
+  {id:"a4",  name:"Waltz Crew",          tag:"Advanced", time:"3/4", pattern:"q q q | h q | e e e e q | h."}
+];
+var DUR = {w:4, h:2, q:1, e:.5, s:.25};
+var VFDUR = {w:"w", h:"h", q:"q", e:"8", s:"16"};
+function parseRhythm(pat, time){
+  var ts = String(time || "4/4").split("/"), num = +ts[0], den = +ts[1];
+  if (den !== 4 || !(num >= 1 && num <= 7)) return {error:"Time signature " + time + " isn't supported yet (use 2/4, 3/4 or 4/4)."};
+  var toks = String(pat || "").trim().split(/\s+/), measures = [[]], pos = 0, notes = [], hadBar = false;
+  if (!pat || !String(pat).trim()) return {error:"Type a rhythm, like:  q q e e q"};
+  for (var i = 0; i < toks.length; i++){
+    var t = toks[i];
+    if (t === "|"){
+      hadBar = true;
+      if (pos !== 0) return {error:"Measure " + measures.length + " has " + fmtBeats(pos) + " beats before the barline; it needs " + num + "."};
+      continue;
+    }
+    var m = /^([whqes])(\.?)(r?)$/i.exec(t);
+    if (!m) return {error:"I don't understand \"" + t + "\". Use w h q e s, add . for dotted and r for a rest."};
+    var b = DUR[m[1].toLowerCase()] * (m[2] ? 1.5 : 1);
+    if (pos + b > num + 1e-9) return {error:"\"" + t + "\" in measure " + measures.length + " goes past the barline (" + fmtBeats(pos) + " + " + fmtBeats(b) + " > " + num + " beats)."};
+    var n = {d:m[1].toLowerCase(), dot:!!m[2], rest:!!m[3], beats:b, pos:pos, m:measures.length - 1, start:(measures.length - 1) * num + pos};
+    measures[measures.length - 1].push(n); notes.push(n);
+    pos += b;
+    if (Math.abs(pos - num) < 1e-9){ pos = 0; measures.push([]); }
+  }
+  if (measures[measures.length - 1].length === 0) measures.pop();
+  else return {error:"The last measure only has " + fmtBeats(pos) + " of " + num + " beats."};
+  return {num:num, den:den, measures:measures, notes:notes, total:measures.length * num};
+}
+function fmtBeats(b){ var w = Math.floor(b), f = b - w, fr = {0:"",.25:"¼",.5:"½",.75:"¾"}[Math.round(f * 4) / 4]; return (w || !fr ? w : "") + (fr || ""); }
+// counting labels (Mat's system): start count full size, held counts small + underlined, rests in ( )
+function posName(p){ var b = Math.floor(p + 1e-9), f = Math.round((p - b) * 4); return f === 0 ? String(b + 1) : f === 2 ? "&" : f === 1 ? "e" : "a"; }
+function countLabel(n){
+  var s = n.pos, e = n.pos + n.beats, held = [];
+  // show sixteenth-level held counts only if the note starts/ends on an e or a; & level if it starts/ends on an &
+  function off(x, g){ return Math.abs(x * g - Math.round(x * g)) > 1e-6; }
+  var q = off(s, 2) || off(e, 2);
+  var h = q || off(s, 1) || off(e, 1);
+  for (var p = s + .25; p < e - 1e-9; p += .25){
+    var fq = Math.round((p % 1) * 4);
+    if (fq === 0 || (fq === 2 && h) || ((fq === 1 || fq === 3) && q)) held.push(posName(p));
+  }
+  return {start:posName(s), held:held, rest:n.rest};
+}
+
+/* ======================= notation (VexFlow) ======================= */
+function drawRhythm(host, r, opt){
+  opt = opt || {};
+  host.innerHTML = "";
+  var p = parseRhythm(r.pattern, r.time);
+  if (p.error){ host.innerHTML = '<div class="err">' + esc(p.error) + "</div>"; return null; }
+  if (!window.Vex || !Vex.Flow){ host.innerHTML = '<div class="err">Notation library didn\'t load.</div>'; return null; }
+  var VF = Vex.Flow, perLine = opt.perLine || 4, M = p.measures.length, lines = Math.ceil(M / perLine);
+  var LW = 30 + Math.min(perLine, M) * 185, LH = opt.counts ? 118 : 92, SC = 1.6, top = 4;
+  var renderer = new VF.Renderer(host, VF.Renderer.Backends.SVG);
+  renderer.resize(LW * SC, (lines * LH + top + 8) * SC);
+  var ctx = renderer.getContext(); ctx.scale(SC, SC);
+  var svg = host.querySelector("svg");
+  var out = [];
+  for (var li = 0; li < lines; li++){
+    var first = li * perLine, cnt = Math.min(perLine, M - first);
+    var extra = li === 0 ? 34 : 0, mw = (LW - 16 - extra) / Math.min(perLine, M), x = 8, y = top + li * LH;
+    for (var mi = first; mi < first + cnt; mi++){
+      var w = mw + (mi === first ? extra : 0);
+      var st = new VF.Stave(x, y, w);
+      st.setConfigForLines([0,1,2,3,4].map(function(k){ return {visible: k === 2}; }));
+      if (mi === 0) st.addTimeSignature(r.time);
+      if (mi === first) st.setBegBarType(VF.Barline.type.NONE);
+      if (mi === M - 1) st.setEndBarType(VF.Barline.type.END);
+      st.setContext(ctx).draw();
+      var notes = p.measures[mi].map(function(n){
+        var sn = new VF.StaveNote({keys:["b/4"], duration:VFDUR[n.d] + (n.rest ? "r" : ""), stem_direction:1, clef:"treble"});
+        if (n.dot){ if (VF.Dot.buildAndAttach) VF.Dot.buildAndAttach([sn], {all:true}); else sn.addDotToAll(); }
+        return sn;
+      });
+      var voice = new VF.Voice({num_beats:p.num, beat_value:4}).setMode(VF.Voice.Mode.SOFT).addTickables(notes);
+      var beams = VF.Beam.generateBeams(notes, {groups:[new VF.Fraction(1, 4)], stem_direction:1});
+      new VF.Formatter().joinVoices([voice]).formatToStave([voice], st);
+      voice.draw(ctx, st);
+      beams.forEach(function(b){ b.setContext(ctx).draw(); });
+      for (var ni = 0; ni < notes.length; ni++){
+        var sn = notes[ni], n = p.measures[mi][ni];
+        var el = sn.getSVGElement ? sn.getSVGElement() : (sn.attrs && sn.attrs.el);
+        var nx = sn.getAbsoluteX() + (sn.getGlyphWidth ? sn.getGlyphWidth() / 2 : 5);
+        var o = {n:n, el:el, x:nx, cnt:null};
+        if (opt.counts){
+          var L = countLabel(n), t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          t.setAttribute("x", nx); t.setAttribute("y", st.getYForLine(2) + 46); t.setAttribute("text-anchor", "middle");
+          t.setAttribute("class", "cnt"); t.setAttribute("font-size", "15");
+          var html = (L.rest ? "(" : "") + esc(L.start);
+          L.held.forEach(function(hc){ html += '<tspan font-size="10" dy="-5" text-decoration="underline">' + esc(hc) + '</tspan><tspan font-size="10" dy="5"> </tspan>'; });
+          html += L.rest ? ")" : "";
+          t.innerHTML = html;
+          svg.appendChild(t); o.cnt = t;
+        }
+        out.push(o);
+      }
+      x += w;
+    }
+  }
+  svg.removeAttribute("width"); svg.removeAttribute("height"); svg.style.width = "100%"; svg.style.height = "auto";
+  if (!svg.getAttribute("viewBox")) svg.setAttribute("viewBox", "0 0 " + LW + " " + (lines * LH + top + 8));
+  return {p:p, notes:out};
+}
+
+/* ======================= playback ======================= */
+var PB = null; // {gain, t0, spb, countIn, total, passes, raf, onEnd}
+function stopPlayback(silent){
+  if (!PB) return;
+  try{ PB.gain.disconnect(); }catch(e){}
+  cancelAnimationFrame(PB.raf);
+  clearMarks(PB.drawn);
+  $("countin").className = "countin";
+  var cb = PB.onEnd; PB = null;
+  if (!silent && cb) cb(false);
+  updatePlayBtn();
+}
+function clearMarks(drawn){ if (!drawn) return; drawn.notes.forEach(function(o){ if (o.el) o.el.classList.remove("now"); if (o.cnt) o.cnt.classList.remove("now"); }); }
+function play(drawn, o){
+  stopPlayback(true);
+  var a = ac(); if (!a || !drawn) return;
+  var p = drawn.p, spb = 60 / o.bpm, gain = a.createGain(); gain.gain.value = soundOn ? 1 : 0; gain.connect(a.destination);
+  var countIn = p.num, t0 = a.currentTime + .15, total = p.total, passes = o.passes, b, i;
+  for (b = 0; b < countIn; b++) tone(b === 0 ? 1500 : 1000, t0 + b * spb, .07, "square", .18, gain);
+  for (var ps = 0; ps < passes; ps++){
+    var base = countIn + ps * total;
+    if (o.click) for (b = 0; b < total; b++) tone(b % p.num === 0 ? 1500 : 1000, t0 + (base + b) * spb, .05, "square", .07, gain);
+    if (o.model) for (i = 0; i < p.notes.length; i++) if (!p.notes[i].rest) noise(t0 + (base + p.notes[i].start) * spb, .12, .9, 1800, gain);
+  }
+  PB = {gain:gain, t0:t0, spb:spb, countIn:countIn, total:total, passes:passes, drawn:drawn, onEnd:o.onEnd, onPass:o.onPass, lastIdx:-1, lastPass:-2};
+  updatePlayBtn();
+  function frame(){
+    if (!PB) return;
+    var beat = (a.currentTime - PB.t0) / PB.spb, ci = $("countin");
+    if (beat < 0){ PB.raf = requestAnimationFrame(frame); return; }
+    if (beat < countIn){
+      ci.textContent = Math.floor(beat) + 1; ci.className = "countin show";
+      if (PB.lastPass !== -1){ PB.lastPass = -1; if (PB.onPass) PB.onPass(-1); }
+    } else {
+      ci.className = "countin";
+      var rel = beat - countIn, pass = Math.floor(rel / total), inP = rel - pass * total;
+      if (pass >= passes){ var cb = PB.onEnd; clearMarks(drawn); PB = null; updatePlayBtn(); if (cb) cb(true); return; }
+      if (pass !== PB.lastPass){ PB.lastPass = pass; if (PB.onPass) PB.onPass(pass); }
+      var idx = -1;
+      for (i = 0; i < p.notes.length; i++){ if (p.notes[i].start <= inP + 1e-6) idx = i; else break; }
+      if (idx !== PB.lastIdx){
+        clearMarks(drawn);
+        var o2 = drawn.notes[idx]; if (o2){ if (o2.el) o2.el.classList.add("now"); if (o2.cnt) o2.cnt.classList.add("now"); }
+        PB.lastIdx = idx;
+      }
+    }
+    PB.raf = requestAnimationFrame(frame);
+  }
+  PB.raf = requestAnimationFrame(frame);
+}
+function updatePlayBtn(){ var b = $("playBtn"); if (b) b.textContent = PB && current === "rhythm" ? "■ Stop" : "▶ Play"; }
+
+/* ======================= storage / classes ======================= */
+var CLASSES = [
+  {id:"b1", name:"1st Block · 8th Grade Band"},
+  {id:"b3", name:"3rd Block · 7th Grade Band"},
+  {id:"b4", name:"4th Block · 7th Grade Band"},
+  {id:"b6", name:"6th Block · 6th Grade Intermediate"},
+  {id:"b7", name:"7th Block · 6th Grade Beginning"},
+  {id:"x",  name:"Other / practice"}
+];
+var DEF_SET = {k:5, thr:10, sus:4, def:60, vote:10, pass:2, tempo:80, reveal:1};
+var rhythms = load("sus.rhythms", null) || JSON.parse(JSON.stringify(DEFAULT_RHYTHMS));
+var classData = load("sus.classes", {});
+var clsId = load("sus.cls", "b1");
+var G = load("sus.game", null);
+var view = load("sus.view", {counts:false, click:true, model:false});
+function saveRhythms(){ save("sus.rhythms", rhythms); }
+function saveClasses(){ save("sus.classes", classData); }
+function saveGame(){ save("sus.game", G); }
+function cd(){
+  if (!classData[clsId]) classData[clsId] = {roster:"", absent:[], nOnly:25, set:JSON.parse(JSON.stringify(DEF_SET)), rh:DEFAULT_RHYTHMS.filter(function(r){ return r.tag === "Original 10"; }).map(function(r){ return r.id; })};
+  var c = classData[clsId]; for (var k in DEF_SET) if (c.set[k] == null) c.set[k] = DEF_SET[k];
+  return c;
+}
+function rosterNames(c){ return c.roster.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean); }
+function presentPlayers(c){
+  var names = rosterNames(c);
+  if (!names.length){ var a = []; for (var i = 1; i <= Math.max(2, Math.min(63, +c.nOnly || 0)); i++) a.push("#" + i); return {names:a, numeric:true}; }
+  return {names:names.filter(function(n){ return c.absent.indexOf(n) < 0; }), numeric:false};
+}
+function rhById(id){ for (var i = 0; i < rhythms.length; i++) if (rhythms[i].id === id) return rhythms[i]; return null; }
+
+/* ======================= theme / topbar ======================= */
+function applyTheme(){ var l = load("sus.theme", "dark") === "light"; document.body.classList.toggle("light", l); $("themeBtn").textContent = l ? "☀️" : "🌙"; }
+$("themeBtn").onclick = function(){ save("sus.theme", load("sus.theme", "dark") === "light" ? "dark" : "light"); applyTheme(); };
+function applySound(){ $("soundBtn").textContent = soundOn ? "🔊" : "🔇"; if (PB) PB.gain.gain.value = soundOn ? 1 : 0; }
+$("soundBtn").onclick = function(){ soundOn = !soundOn; save("sus.sound", soundOn); applySound(); };
+$("menuBtn").onclick = function(){ $("menu").classList.add("show"); };
+
+/* ======================= HOME ======================= */
+function renderHome(){
+  var h = "";
+  for (var i = 0; i < 7; i++) h += '<span class="bob" style="display:inline-block;animation-delay:' + (i * .35) + 's">' + raven(SUITS[i]) + "</span>";
+  $("homeCrew").innerHTML = h;
+}
+$("goRole").onclick = function(){ openRole(""); };
+$("goTeacher").onclick = function(){ openSetup(); };
+
+/* ======================= STUDENT ROLE ======================= */
+function openRole(code){
+  if (code) $("rCode").value = fmtCode(cleanCode(code));
+  $("roleCard").className = "rolecard"; $("rMsg").textContent = "";
+  show("role");
+}
+$("roleHome").onclick = function(){ history.replaceState(null, "", location.pathname); show("home"); };
+$("rCode").addEventListener("input", function(){ $("rMsg").textContent = ""; });
+function roleCheck(){
+  var info = decodeCode($("rCode").value), num = parseInt($("rNum").value, 10);
+  if (!info) return {err:"That game code doesn't look right. Check the board and try again."};
+  if (!(num >= 1 && num <= info.n)) return {err:"Your number should be between 1 and " + info.n + "."};
+  var key = "sus.lock." + cleanCode($("rCode").value), lock = load(key, null);
+  if (lock != null && lock !== num) return {err:"This device already checked number " + lock + " for this game. Ask your teacher if that's a mistake."};
+  save(key, num);
+  return {imp:imposters(info.seed, info.n, info.k).indexOf(num) >= 0, num:num, k:info.k};
+}
+function holdOn(e){
+  if (e) e.preventDefault();
+  var r = roleCheck(), c = $("roleCard");
+  if (r.err){ $("rMsg").textContent = r.err; return; }
+  $("rMsg").textContent = "";
+  if (r.imp){
+    c.className = "rolecard imp show";
+    c.innerHTML = raven("#e5343a") + "<h2>IMPOSTER</h2><div style='font-size:1.15em'>Mess up the rhythm in <b>at least 2 different places</b> every time. Blend in, vote, and blame anyone you like. Don't tell anyone!</div><div style='margin-top:8px;opacity:.8'>There are " + r.k + " imposters this game.</div>";
+  } else {
+    c.className = "rolecard crew show";
+    c.innerHTML = raven(colorFor(r.num)) + "<h2>CREWMATE</h2><div style='font-size:1.15em'>Clap every rhythm <b>perfectly</b> and listen for who's messing up. Help vote out all the imposters!</div>";
+  }
+}
+function holdOff(){ $("roleCard").className = "rolecard"; }
+(function(){
+  var b = $("holdBtn");
+  b.addEventListener("pointerdown", holdOn); b.addEventListener("pointerup", holdOff); b.addEventListener("pointerleave", holdOff); b.addEventListener("pointercancel", holdOff);
+  b.addEventListener("touchstart", function(e){ if (!window.PointerEvent) holdOn(e); }, {passive:false});
+  b.addEventListener("touchend", function(){ if (!window.PointerEvent) holdOff(); });
+  b.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+})();
+
+/* ======================= SETUP ======================= */
+function openSetup(){
+  stopPlayback(true);
+  var sel = $("clsSel"); sel.innerHTML = CLASSES.map(function(c){ return '<option value="' + c.id + '">' + esc(c.name) + "</option>"; }).join("");
+  sel.value = clsId;
+  fillSetup();
+  var rb = $("resumeBox");
+  if (G && !G.over){
+    rb.innerHTML = '<div class="panel" style="border-color:var(--gold)"><b>Game in progress</b> — ' + esc(clsName(G.cls)) + ", code " + fmtCode(G.code) + ", " + aliveCount() + " players left. " +
+      '<button class="btn primary small" id="resumeBtn">Resume →</button></div>';
+    $("resumeBtn").onclick = function(){ resumeGame(); };
+  } else rb.innerHTML = "";
+  show("setup");
+}
+function clsName(id){ for (var i = 0; i < CLASSES.length; i++) if (CLASSES[i].id === id) return CLASSES[i].name; return id; }
+function fillSetup(){
+  var c = cd();
+  $("roster").value = c.roster; $("nOnly").value = c.nOnly;
+  $("sK").value = c.set.k; $("sThr").value = c.set.thr; $("sSus").value = c.set.sus; $("sDef").value = c.set.def;
+  $("sVote").value = c.set.vote; $("sPass").value = c.set.pass; $("sTempo").value = c.set.tempo; $("sReveal").value = String(c.set.reveal);
+  renderPresent(); renderRhPick(); validateSetup();
+}
+function renderPresent(){
+  var c = cd(), names = rosterNames(c), box = $("present");
+  $("nOnly").disabled = names.length > 0;
+  if (!names.length){ box.innerHTML = '<span class="muted">Numbers only: players will be #1 to #' + c.nOnly + ".</span>"; $("presentCount").textContent = ""; return; }
+  box.innerHTML = names.map(function(n, i){ return '<button class="chip' + (c.absent.indexOf(n) >= 0 ? " off" : "") + '" data-i="' + i + '">' + esc(n) + "</button>"; }).join("");
+  $("presentCount").textContent = presentPlayers(c).names.length + " here today";
+}
+$("present").onclick = function(e){
+  var b = e.target.closest ? e.target.closest(".chip") : null; if (!b) return;
+  var c = cd(), n = rosterNames(c)[+b.getAttribute("data-i")], ix = c.absent.indexOf(n);
+  if (ix >= 0) c.absent.splice(ix, 1); else c.absent.push(n);
+  saveClasses(); renderPresent(); validateSetup();
+};
+function renderRhPick(){
+  var c = cd();
+  c.rh = c.rh.filter(function(id){ return !!rhById(id); });
+  $("rhPick").innerHTML = rhythms.map(function(r){ var on = c.rh.indexOf(r.id) >= 0; return '<button class="chip' + (on ? " sel" : " off") + '" data-id="' + esc(r.id) + '">' + esc(r.name) + ' <span class="muted" style="font-size:.8em">' + esc(r.tag || "") + "</span></button>"; }).join("");
+  $("rhCount").textContent = c.rh.length + " picked";
+}
+$("rhPick").onclick = function(e){
+  var b = e.target.closest ? e.target.closest(".chip") : null; if (!b) return;
+  var c = cd(), id = b.getAttribute("data-id");
+  if (c.rh.indexOf(id) >= 0) c.rh = c.rh.filter(function(x){ return x !== id; });
+  else c.rh = rhythms.map(function(r){ return r.id; }).filter(function(x){ return x === id || c.rh.indexOf(x) >= 0; });
+  saveClasses(); renderRhPick(); validateSetup();
+};
+$("rhAll").onclick = function(){ cd().rh = rhythms.map(function(r){ return r.id; }); saveClasses(); renderRhPick(); validateSetup(); };
+$("rhNone").onclick = function(){ cd().rh = []; saveClasses(); renderRhPick(); validateSetup(); };
+$("clsSel").onchange = function(){ clsId = this.value; save("sus.cls", clsId); fillSetup(); };
+$("roster").oninput = function(){ var c = cd(); c.roster = this.value; var names = rosterNames(c); c.absent = c.absent.filter(function(n){ return names.indexOf(n) >= 0; }); saveClasses(); renderPresent(); validateSetup(); };
+$("nOnly").oninput = function(){ cd().nOnly = Math.max(2, Math.min(63, +this.value || 2)); saveClasses(); renderPresent(); validateSetup(); };
+["sK","sThr","sSus","sDef","sVote","sPass","sTempo","sReveal"].forEach(function(id){
+  $(id).oninput = $(id).onchange = function(){
+    var c = cd(), map = {sK:"k", sThr:"thr", sSus:"sus", sDef:"def", sVote:"vote", sPass:"pass", sTempo:"tempo", sReveal:"reveal"};
+    c.set[map[id]] = +this.value; saveClasses(); validateSetup();
+  };
+});
+function validateSetup(){
+  var c = cd(), n = presentPlayers(c).names.length, s = c.set, w = [];
+  if (n > 63) w.push("The game code supports up to 63 players.");
+  if (n < 4) w.push("You need at least 4 players.");
+  if (s.k < 1 || s.k > 15) w.push("Imposters must be 1–15.");
+  if (s.k >= n / 2) w.push("Too many imposters for " + n + " players.");
+  var crew = n - s.k;
+  if (s.thr > crew) w.push("Only " + crew + " crewmates, so imposters would win right away. Lower the \"drop below\" number.");
+  else if (s.thr > 0) {
+    var need = crew - s.thr + 1;
+    $("ruleWarn").className = "muted";
+    if (!w.length){ $("ruleWarn").textContent = n + " players → " + crew + " crewmates. Imposters win after " + need + " crewmate" + (need === 1 ? " is" : "s are") + " ejected; crew wins by ejecting all " + s.k + " imposters."; }
+  }
+  if (!c.rh.length) w.push("Pick at least one rhythm.");
+  if (w.length){ $("ruleWarn").className = "warn"; $("ruleWarn").textContent = w.join(" "); }
+  $("startGame").disabled = w.length > 0;
+  return !w.length;
+}
+$("setupHome").onclick = function(){ show("home"); };
+$("startGame").onclick = function(){
+  if (!validateSetup()) return;
+  if (G && !G.over && !confirm("Start a new game? The game in progress will be lost.")) return;
+  var c = cd(), pp = presentPlayers(c), n = pp.names.length, s = c.set;
+  var seed = Math.floor(Math.random() * 32768), code = encodeCode(seed, n, s.k);
+  G = {cls:clsId, code:code, n:n, k:s.k, numeric:pp.numeric,
+       players:pp.names.map(function(nm, i){ return {no:i + 1, name:pp.numeric ? "Player " + (i + 1) : nm, alive:true}; }),
+       order:c.rh.slice(), idx:0, round:1, thr:s.thr, sus:s.sus, def:s.def, vote:s.vote, passes:s.pass, tempo:s.tempo, reveal:!!s.reveal,
+       hist:[], over:null, played:{}, started:Date.now()};
+  saveGame(); openLobby();
+};
+function resumeGame(){ if (!G) return; if (G.over) return showEnd(); goRhythm(); }
+
+/* ======================= HUD ======================= */
+function aliveCount(){ return G ? G.players.filter(function(p){ return p.alive; }).length : 0; }
+function impSet(){ var d = decodeCode(G.code); return d ? imposters(d.seed, d.n, d.k) : []; }
+function impsLeft(){ var s = impSet(); return G.players.filter(function(p){ return p.alive && s.indexOf(p.no) >= 0; }).length; }
+function crewLeft(){ var s = impSet(); return G.players.filter(function(p){ return p.alive && s.indexOf(p.no) < 0; }).length; }
+function hudHTML(){
+  var h = '<div class="row" style="margin:0">' +
+    '<span class="stat">Players left <b>' + aliveCount() + "</b></span>" +
+    (G.reveal ? '<span class="stat">Imposters left <b>' + impsLeft() + "</b></span>" : '<span class="stat">Imposters <b>' + G.k + "</b> <span class='muted'>(roles hidden)</span></span>") +
+    '<span class="stat">Ejected <b>' + G.hist.length + "</b></span>" +
+    "</div>" +
+    '<div class="row" style="margin:0"><span class="stat">Code <b>' + fmtCode(G.code) + '</b></span><span class="stat muted">' + esc(clsName(G.cls)) + "</span></div>";
+  return h;
+}
+
+/* ======================= LOBBY ======================= */
+function openLobby(){
+  stopPlayback(true);
+  $("lobbyCode").textContent = fmtCode(G.code);
+  var url = APP_URL + "?role=" + G.code;
+  $("joinUrl").textContent = APP_URL.replace(/^https?:\/\//, "");
+  try{ var q = qrcode(0, "M"); q.addData(url); q.make(); $("qr").innerHTML = q.createSvgTag({cellSize:4, margin:2, scalable:true}); }catch(e){ $("qr").innerHTML = ""; }
+  $("lobbyRoster").innerHTML = G.players.map(function(p){ return '<div class="' + (p.alive ? "" : "out") + '"><b>' + p.no + "</b>" + (G.numeric ? "" : esc(p.name)) + "</div>"; }).join("");
+  if (G.numeric) $("lobbyRoster").innerHTML = '<div class="muted" style="column-span:all">Numbers only this game: use the number your teacher gives you (1–' + G.n + ").</div>";
+  show("lobby");
+}
+$("toRules").onclick = function(){ openRules(0, true); };
+$("skipRules").onclick = function(){ goRhythm(); };
+
+/* ======================= RULES ======================= */
+var RULES = [
+  {t:"How to Play", fig:function(){ return raven("#3b82f6"); }, li:[
+    "Everyone checks their <b>secret role</b> on their iPad. Most of you are <b>Crewmates</b>. A few of you are <b>Imposters</b>.",
+    "A rhythm shows up on the board. After the count-in, we clap it <b>two times</b>.",
+    "After we clap, the teacher calls an <b>Emergency Meeting</b> and picks students to say who they think is most <b>sus</b>.",
+    "The suspects get <b>1 minute</b> to argue why they aren't the Imposter.",
+    "Then the whole class votes. If you're voted out, you <b>still clap</b> every rhythm!"]},
+  {t:"Imposter Rules", fig:function(){ return raven("#e5343a"); }, li:[
+    "Do <b>NOT</b> tell anyone you're an Imposter!",
+    "You <b>MUST</b> mess up the rhythm in <b>at least 2 different places</b> each time.",
+    "You can vote, and you can blame anyone or anything to clear your name.",
+    "Imposters win if there are <b>fewer than {thr} crewmates</b> still in the game."]},
+  {t:"Crewmate Rules", fig:function(){ return raven("#22c55e"); }, li:[
+    "Your task: clap every rhythm <b>perfectly</b> so no one thinks you're sus.",
+    "Listen to everyone around you. Who's messing up the rhythm?",
+    "If you're a suspect, defend yourself!",
+    "Crewmates win by voting out <b>all {k} Imposters</b>.",
+    "Think you know who it is? You can call your own Emergency Meeting."]},
+  {t:"How to Vote", fig:function(){ return bellArt(); }, li:[
+    "The teacher picks up to <b>{sus} suspects</b>. Each gets a letter.",
+    "The suspects argue for <b>{def} seconds</b>.",
+    "When voting opens, hold up your hand: <b>✊ fist = Skip</b>, <b>1 finger = A</b>, <b>2 = B</b>, <b>3 = C</b>, <b>4 = D</b>.",
+    "Voting closes when the countdown hits zero. No changing your vote!",
+    "Most votes gets sent out the <b>airlock</b>. A tie or Skip means no one leaves."]}
+];
+var ruleI = 0, rulesFromLobby = false;
+function openRules(i, fromLobby){ ruleI = i || 0; rulesFromLobby = !!fromLobby; renderRule(); show("rules"); }
+function fillT(s){ return s.replace(/\{(\w+)\}/g, function(_, k){ return G ? G[k] : DEF_SET[k]; }); }
+function renderRule(){
+  var r = RULES[ruleI];
+  $("ruleSlide").innerHTML = '<div class="panel" style="overflow:hidden"><div class="rulefig">' + r.fig() + "</div><h2>" + r.t + "</h2><ol>" + r.li.map(function(x){ return "<li>" + fillT(x) + "</li>"; }).join("") + "</ol></div>";
+  $("ruleDots").innerHTML = RULES.map(function(_, i){ return '<span class="' + (i === ruleI ? "on" : "") + '"></span>'; }).join("");
+  $("ruleNext").textContent = ruleI === RULES.length - 1 ? "Let's clap! →" : "Next →";
+}
+$("rulePrev").onclick = function(){ if (ruleI > 0){ ruleI--; renderRule(); } else if (rulesFromLobby) openLobby(); else goRhythm(); };
+$("ruleNext").onclick = function(){ if (ruleI < RULES.length - 1){ ruleI++; renderRule(); } else goRhythm(); };
+
+/* ======================= RHYTHM SCREEN ======================= */
+var drawn = null;
+function curRh(){
+  if (!G.order.length) return null;
+  return rhById(G.order[((G.idx % G.order.length) + G.order.length) % G.order.length]);
+}
+function goRhythm(){
+  if (!G) return openSetup();
+  var r = curRh();
+  if (!r){ toast("No rhythms left in this game's list."); return openSetup(); }
+  show("rhythm");
+  $("hud").innerHTML = hudHTML();
+  var lap = Math.floor(G.idx / G.order.length);
+  $("rhTitle").textContent = r.name;
+  $("rhSub").textContent = "Round " + G.round + (lap > 0 ? " · back through the list (lap " + (lap + 1) + ")" : "") + " · " + r.time;
+  drawn = drawRhythm($("rhNotation"), r, {counts:view.counts, perLine:2});
+  $("tVal").textContent = G.tempo + " BPM";
+  $("cntBtn").classList.toggle("on", !!view.counts); $("clkBtn").classList.toggle("on", !!view.click); $("mdlBtn").classList.toggle("on", !!view.model);
+  $("passTxt").textContent = "Clap it " + G.passes + (G.passes === 1 ? " time" : " times");
+  $("emergBtn").classList.toggle("pulse", !!G.played[G.idx]);
+  $("prevRh").disabled = G.idx <= 0;
+  updatePlayBtn();
+}
+function togglePlay(){
+  if (PB){ stopPlayback(); return; }
+  if (!drawn) return;
+  play(drawn, {bpm:G.tempo, passes:G.passes, click:view.click, model:view.model,
+    onPass:function(ps){ $("passTxt").textContent = ps < 0 ? "Get ready…" : "Time " + (ps + 1) + " of " + G.passes; },
+    onEnd:function(done){
+      $("passTxt").textContent = done ? "Done! Who's sus? 👀" : "Stopped";
+      if (done){ G.played[G.idx] = 1; saveGame(); $("emergBtn").classList.add("pulse"); }
+    }});
+}
+$("playBtn").onclick = togglePlay;
+$("tDown").onclick = function(){ G.tempo = Math.max(40, G.tempo - 4); saveGame(); $("tVal").textContent = G.tempo + " BPM"; };
+$("tUp").onclick = function(){ G.tempo = Math.min(200, G.tempo + 4); saveGame(); $("tVal").textContent = G.tempo + " BPM"; };
+$("cntBtn").onclick = function(){ view.counts = !view.counts; save("sus.view", view); stopPlayback(true); goRhythm(); };
+$("clkBtn").onclick = function(){ view.click = !view.click; save("sus.view", view); this.classList.toggle("on", view.click); };
+$("mdlBtn").onclick = function(){ view.model = !view.model; save("sus.view", view); this.classList.toggle("on", view.model); };
+$("prevRh").onclick = function(){ stopPlayback(true); if (G.idx > 0){ G.idx--; saveGame(); goRhythm(); } };
+$("nextRh").onclick = function(){ stopPlayback(true); G.idx++; saveGame(); goRhythm(); };
+$("emergBtn").onclick = function(){ startMeeting(); };
+
+/* ======================= MEETING ======================= */
+var MT = null; // {step, picks:[no], votes:{}, timer}
+function startMeeting(){
+  stopPlayback(true);
+  MT = {step:"pick", picks:[], votes:{}, timer:null, left:0};
+  var al = $("alarm"); $("bellSvg").innerHTML = bellArt(); $("alarmWho").textContent = "Round " + G.round;
+  al.className = "alarm"; void al.offsetWidth; al.className = "alarm show";
+  sfx("siren");
+  var done = false;
+  function go(){ if (done) return; done = true; al.className = "alarm"; renderMeeting(); show("meeting"); }
+  al.onclick = go; setTimeout(go, 2800);
+}
+function clearTimer(){ if (MT && MT.timer){ clearInterval(MT.timer); MT.timer = null; } }
+function pById(no){ for (var i = 0; i < G.players.length; i++) if (G.players[i].no === no) return G.players[i]; return null; }
+function pName(no){ var p = pById(no); return G.numeric ? "#" + no : (p ? p.name : "#" + no); }
+var HANDS = ["☝️","✌️","3️⃣","4️⃣"];
+function renderMeeting(){
+  $("hud2").innerHTML = hudHTML();
+  var b = $("meetBody"), L = "ABCD", h = "";
+  if (MT.step === "pick"){
+    h += '<div class="steptitle">Who\'s sus? <span class="muted" style="font-size:.6em">Tap up to ' + G.sus + " suspects</span></div>";
+    h += '<div class="sus-grid">' + G.players.filter(function(p){ return p.alive; }).map(function(p){
+      var ix = MT.picks.indexOf(p.no);
+      return '<button class="pbtn' + (ix >= 0 ? " sel" : "") + '" data-no="' + p.no + '"><span class="no">' + p.no + "</span>" + (G.numeric ? "" : esc(p.name)) + (ix >= 0 ? '<span class="tag">' + L[ix] + "</span>" : "") + "</button>";
+    }).join("") + "</div>";
+    h += '<div class="row" style="justify-content:center;margin-top:14px">' +
+      '<button class="btn primary big" id="mDefend"' + (MT.picks.length < 1 ? " disabled" : "") + ">Start defense (" + G.def + "s) →</button>" +
+      '<button class="btn" id="mVoteNow"' + (MT.picks.length < 1 ? " disabled" : "") + ">Skip to vote</button>" +
+      '<button class="btn" id="mCancel">Cancel meeting</button></div>';
+  } else if (MT.step === "defense" || MT.step === "vote" || MT.step === "tally"){
+    var title = MT.step === "defense" ? "Defend yourselves!" : MT.step === "vote" ? "VOTE NOW!" : "Count the votes";
+    h += '<div class="steptitle">' + title + "</div>";
+    if (MT.step !== "tally") h += '<div class="bigtimer' + (MT.left <= 5 ? " hot" : "") + '" id="mTimer">' + fmtTime(MT.left) + "</div>";
+    if (MT.step === "vote") h += '<div class="center muted" style="font-size:1.2em">Voting closes when the countdown hits zero!</div>';
+    var opts = MT.picks.map(function(no, i){ return {key:String(no), letter:L[i], hand:HANDS[i], fingers:(i + 1) + (i ? " fingers" : " finger"), name:pName(no), no:no}; });
+    opts.push({key:"skip", letter:"SKIP", hand:"✊", fingers:"fist", name:"Skip", no:0});
+    var lead = MT.step === "tally" ? leader() : null;
+    h += '<div class="cards">' + opts.map(function(o){
+      var v = MT.votes[o.key] || 0;
+      return '<div class="scard' + (lead && lead.key === o.key ? " lead" : "") + '">' +
+        (o.no ? raven(colorFor(o.no), {cls:"av"}) : "") +
+        '<div class="hand">' + o.hand + '</div><div class="letter">' + (o.no ? o.letter + " · " + o.fingers : "Fist = Skip") + '</div><div class="nm">' + esc(o.name) + "</div>" +
+        (MT.step === "tally" ? '<div class="tally"><button class="btn" data-dn="' + o.key + '">−</button><b>' + v + '</b><button class="btn" data-up="' + o.key + '">+</button></div>' +
+          (o.no ? '<button class="btn small danger" data-ej="' + o.no + '" style="margin-top:8px">Eject ' + esc(o.name) + "</button>" : "") : "") +
+        "</div>";
+    }).join("") + "</div>";
+    if (MT.step === "defense") h += '<div class="row" style="justify-content:center"><button class="btn" id="mPause">' + (MT.timer ? "⏸ Pause" : "▶ Resume") + '</button><button class="btn" id="mAdd">+15s</button><button class="btn primary big" id="mToVote">Open voting →</button></div>';
+    if (MT.step === "vote") h += '<div class="row" style="justify-content:center"><button class="btn" id="mToTally">Close voting now</button></div>';
+    if (MT.step === "tally"){
+      var tie = lead === null, msg;
+      if (tie) msg = "It's a tie, so no one is ejected (you can still eject someone with the red buttons).";
+      else if (lead.key === "skip") msg = "Skip wins, so no one is ejected.";
+      else msg = "Most votes: <b>" + esc(pName(+lead.key)) + "</b>";
+      var total = 0; for (var k in MT.votes) total += MT.votes[k];
+      h += '<div class="center" style="font-size:1.25em;margin:4px 0 10px">' + msg + ' <span class="muted">(' + total + " votes counted · " + aliveCount() + " players)</span></div>";
+      h += '<div class="row" style="justify-content:center">' +
+        (!tie && lead.key !== "skip" ? '<button class="btn danger big" data-ej="' + lead.key + '">🚀 Eject ' + esc(pName(+lead.key)) + "</button>" : "") +
+        '<button class="btn big" id="mNoEject">No one ejected</button><button class="btn" id="mRevote">Re-vote</button></div>' +
+        '<div class="center muted" style="margin-top:8px">Not counting? Just tap the red Eject button under the person with the most hands.</div>';
+    }
+  }
+  b.innerHTML = h;
+  wireMeeting();
+}
+function fmtTime(s){ s = Math.max(0, Math.ceil(s)); return s >= 60 ? Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2) : String(s); }
+function leader(){
+  var best = -1, keys = [], all = MT.picks.map(String).concat(["skip"]);
+  all.forEach(function(k){ var v = MT.votes[k] || 0; if (v > best){ best = v; keys = [k]; } else if (v === best) keys.push(k); });
+  if (best <= 0 || keys.length !== 1) return null;
+  return {key:keys[0], v:best};
+}
+function runTimer(sec, onDone, beep){
+  clearTimer(); MT.left = sec;
+  var end = Date.now() + sec * 1000;
+  MT.timer = setInterval(function(){
+    var prev = Math.ceil(MT.left);
+    MT.left = (end - Date.now()) / 1000;
+    var el = $("mTimer"); if (el){ el.textContent = fmtTime(MT.left); el.className = "bigtimer" + (MT.left <= 5 ? " hot" : ""); }
+    if (beep && Math.ceil(MT.left) !== prev && MT.left > 0 && MT.left <= 5) sfx("beep");
+    if (MT.left <= 0){ clearTimer(); onDone(); }
+  }, 100);
+  MT.end = end;
+}
+function startDefense(){ MT.step = "defense"; MT.left = G.def; renderMeeting(); runTimer(G.def, function(){ sfx("beep"); startVote(); }, false); renderMeeting(); }
+function startVote(){ clearTimer(); MT.step = "vote"; MT.left = G.vote; renderMeeting(); sfx("beep"); runTimer(G.vote, function(){ sfx("close"); MT.step = "tally"; renderMeeting(); }, true); renderMeeting(); }
+function wireMeeting(){
+  var b = $("meetBody");
+  b.onclick = function(e){
+    var t = e.target.closest ? e.target.closest("button") : null; if (!t) return;
+    var no = t.getAttribute("data-no"), up = t.getAttribute("data-up"), dn = t.getAttribute("data-dn"), ej = t.getAttribute("data-ej");
+    if (no){ no = +no; var ix = MT.picks.indexOf(no); if (ix >= 0) MT.picks.splice(ix, 1); else if (MT.picks.length < G.sus) MT.picks.push(no); else { toast("Up to " + G.sus + " suspects. Tap one to remove it."); return; } sfx("tap"); renderMeeting(); return; }
+    if (up){ MT.votes[up] = (MT.votes[up] || 0) + 1; sfx("tap"); renderMeeting(); return; }
+    if (dn){ MT.votes[dn] = Math.max(0, (MT.votes[dn] || 0) - 1); renderMeeting(); return; }
+    if (ej){ doEject(+ej); return; }
+    switch (t.id){
+      case "mDefend": startDefense(); break;
+      case "mVoteNow": startVote(); break;
+      case "mCancel": clearTimer(); MT = null; goRhythm(); break;
+      case "mPause": if (MT.timer){ clearTimer(); renderMeeting(); } else { runTimer(MT.left, function(){ sfx("beep"); startVote(); }, false); renderMeeting(); } break;
+      case "mAdd": if (MT.timer){ var l = MT.left + 15; runTimer(l, function(){ sfx("beep"); startVote(); }, false); } else MT.left += 15; renderMeeting(); break;
+      case "mToVote": startVote(); break;
+      case "mToTally": clearTimer(); sfx("close"); MT.step = "tally"; renderMeeting(); break;
+      case "mRevote": MT.votes = {}; startVote(); break;
+      case "mNoEject": doEject(0); break;
+    }
+  };
+}
+function doEject(no){
+  clearTimer();
+  var imps = impSet();
+  if (no){ var p = pById(no); p.alive = false; G.hist.push({no:no, round:G.round, rh:G.idx}); }
+  G.round++; G.idx++;
+  var crew = crewLeft(), il = impsLeft();
+  if (il === 0) G.over = "crew"; else if (crew < G.thr) G.over = "imp";
+  saveGame(); MT = null;
+  // ejection scene
+  var ej = $("eject"), txt = $("ejectTxt"), btn = $("ejectGo");
+  $("floater").innerHTML = no ? raven(colorFor(no)) : "";
+  $("floater").style.animation = "none"; void $("floater").offsetWidth; $("floater").style.animation = "";
+  ej.className = "eject show"; btn.style.display = "none"; txt.innerHTML = "";
+  var line1, line2 = "";
+  if (!no) line1 = "No one was ejected.";
+  else {
+    var isImp = imps.indexOf(no) >= 0;
+    line1 = esc(pName(no)) + " was ejected.";
+    if (G.reveal) line2 = esc(pName(no)) + (isImp ? " was an Imposter." : " was not an Imposter.");
+  }
+  var line3 = G.reveal ? (il + (il === 1 ? " Imposter remains." : " Imposters remain.")) : "";
+  if (no) sfx("whoosh");
+  typeOut(txt, line1, function(){
+    if (line2){ setTimeout(function(){ sfx(imps.indexOf(no) >= 0 ? "imp" : "crew"); txt.innerHTML += '<div class="sub" style="font-size:.8em;color:' + (imps.indexOf(no) >= 0 ? "#ff8a8f" : "#9fd8ff") + '">' + line2 + "</div>"; finish(); }, 700); }
+    else finish();
+  });
+  function finish(){
+    setTimeout(function(){ if (line3) txt.innerHTML += '<div class="sub">' + line3 + "</div>"; btn.style.display = ""; btn.textContent = G.over ? "See who won →" : "Next rhythm →"; }, 500);
+  }
+}
+function typeOut(el, s, cb){
+  var tmp = document.createElement("div"); tmp.innerHTML = s; var plain = tmp.textContent, i = 0, d = document.createElement("div"); el.appendChild(d);
+  var iv = setInterval(function(){ i++; d.textContent = plain.slice(0, i); if (i >= plain.length){ clearInterval(iv); if (cb) cb(); } }, 55);
+}
+$("ejectGo").onclick = function(){ $("eject").className = "eject"; if (G.over) showEnd(); else goRhythm(); };
+
+/* ======================= END ======================= */
+function showEnd(){
+  stopPlayback(true);
+  var imps = impSet(), win = G.over;
+  var h = "";
+  if (win === "crew") h += '<div class="winner crew">CREWMATES WIN!</div><div class="muted" style="font-size:1.3em">Every Imposter was found. Nice listening, band.</div>';
+  else if (win === "imp") h += '<div class="winner imp">IMPOSTERS WIN!</div><div class="muted" style="font-size:1.3em">Too many crewmates got ejected.</div>';
+  else h += '<div class="winner">GAME OVER</div>';
+  h += '<h2 style="margin-top:20px">The Imposters were…</h2><div class="crew-row">' + imps.map(function(no){ var p = pById(no); return '<div class="m">' + raven("#e5343a", {cross:p && !p.alive}) + "<div>" + esc(pName(no)) + "</div><div class='muted' style='font-size:.85em'>" + (p && p.alive ? "never caught" : "ejected") + "</div></div>"; }).join("") + "</div>";
+  var wrong = G.hist.filter(function(x){ return imps.indexOf(x.no) < 0; });
+  if (wrong.length) h += '<h3 style="margin-top:14px">Crewmates who got ejected</h3><div class="muted" style="font-size:1.1em">' + wrong.map(function(x){ return esc(pName(x.no)); }).join(", ") + "</div>";
+  h += '<div class="row" style="justify-content:center;margin-top:20px"><button class="btn primary big" id="endNew">New game</button><button class="btn" id="endUndo">↶ Undo last ejection</button></div>';
+  $("endBody").innerHTML = h;
+  $("endNew").onclick = function(){ G.over = G.over || "ended"; saveGame(); openSetup(); };
+  $("endUndo").onclick = function(){ undoEject(); };
+  if (win === "crew" || win === "imp") sfx("win");
+  show("end");
+}
+function undoEject(){
+  if (!G || !G.hist.length){ toast("Nothing to undo."); return; }
+  var last = G.hist.pop(), p = pById(last.no); if (p) p.alive = true;
+  G.round = Math.max(1, G.round - 1); G.idx = last.rh; G.over = null; saveGame();
+  toast("Brought back " + pName(last.no) + "."); goRhythm();
+}
+
+/* ======================= MENU ======================= */
+$("menu").onclick = function(e){
+  var t = e.target.closest ? e.target.closest("[data-m]") : null;
+  if (e.target === this){ this.classList.remove("show"); return; }
+  if (!t) return;
+  var m = t.getAttribute("data-m"); this.classList.remove("show");
+  clearTimer();
+  if (m === "rules") openRules(0, false);
+  else if (m === "lobby") openLobby();
+  else if (m === "rhythm"){ MT = null; goRhythm(); }
+  else if (m === "undo") undoEject();
+  else if (m === "end"){ if (confirm("End the game and reveal the imposters?")){ G.over = G.over || "ended"; saveGame(); showEnd(); } }
+  else if (m === "setup") openSetup();
+};
+(function(){
+  var b = $("peekBtn"), o = $("peekOut");
+  function on(e){ if (e) e.preventDefault(); if (!G) return; o.textContent = impSet().map(function(no){ var p = pById(no); return pName(no) + (p && !p.alive ? " (out)" : ""); }).join(", "); }
+  function off(){ o.textContent = ""; }
+  b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off); b.addEventListener("pointercancel", off);
+  b.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+})();
+
+/* ======================= EDITOR ======================= */
+var edSel = 0, edDrawn = null;
+function openEditor(){ stopPlayback(true); edSel = Math.min(edSel, rhythms.length - 1); renderEdList(); loadEd(); show("editor"); }
+$("openEditor").onclick = openEditor;
+$("edDone").onclick = function(){ stopPlayback(true); openSetup(); };
+function renderEdList(){
+  $("edList").innerHTML = rhythms.map(function(r, i){ var ok = !parseRhythm(r.pattern, r.time).error; return '<button class="ritem' + (i === edSel ? " sel" : "") + '" data-i="' + i + '">' + (ok ? "" : "⚠️ ") + esc(r.name) + "<small>" + esc(r.tag || "") + " · " + esc(r.time) + "</small></button>"; }).join("");
+  var tags = {}; rhythms.forEach(function(r){ if (r.tag) tags[r.tag] = 1; });
+  $("tagList").innerHTML = Object.keys(tags).map(function(t){ return '<option value="' + esc(t) + '">'; }).join("");
+}
+$("edList").onclick = function(e){ var b = e.target.closest ? e.target.closest(".ritem") : null; if (!b) return; edSel = +b.getAttribute("data-i"); renderEdList(); loadEd(); };
+function loadEd(){
+  var r = rhythms[edSel]; if (!r) return;
+  $("edName").value = r.name; $("edTag").value = r.tag || ""; $("edTime").value = r.time; $("edPat").value = r.pattern;
+  previewEd();
+}
+function previewEd(){
+  var r = rhythms[edSel], p = parseRhythm(r.pattern, r.time);
+  $("edErr").textContent = p.error || "";
+  edDrawn = drawRhythm($("edPrev"), r, {counts:true});
+}
+function edChange(){ var r = rhythms[edSel]; r.name = $("edName").value.trim() || "Untitled"; r.tag = $("edTag").value.trim(); r.time = $("edTime").value; r.pattern = $("edPat").value.trim(); saveRhythms(); previewEd(); renderEdList(); }
+["edName","edTag","edTime","edPat"].forEach(function(id){ $(id).addEventListener("input", edChange); $(id).addEventListener("change", edChange); });
+function newId(){ return "u" + Date.now().toString(36) + Math.floor(Math.random() * 1000); }
+$("edNew").onclick = function(){ rhythms.push({id:newId(), name:"New rhythm", tag:"My rhythms", time:"4/4", pattern:"q q q q | e e e e q q | q qr q qr | w"}); edSel = rhythms.length - 1; saveRhythms(); renderEdList(); loadEd(); $("edName").focus(); };
+$("edDup").onclick = function(){ var r = JSON.parse(JSON.stringify(rhythms[edSel])); r.id = newId(); r.name += " (copy)"; rhythms.splice(edSel + 1, 0, r); edSel++; saveRhythms(); renderEdList(); loadEd(); };
+$("edUp").onclick = function(){ if (edSel > 0){ var r = rhythms.splice(edSel, 1)[0]; rhythms.splice(--edSel, 0, r); saveRhythms(); renderEdList(); } };
+$("edDown").onclick = function(){ if (edSel < rhythms.length - 1){ var r = rhythms.splice(edSel, 1)[0]; rhythms.splice(++edSel, 0, r); saveRhythms(); renderEdList(); } };
+$("edDel").onclick = function(){ if (rhythms.length <= 1) return toast("Keep at least one rhythm."); if (!confirm("Delete \"" + rhythms[edSel].name + "\"?")) return; rhythms.splice(edSel, 1); edSel = Math.max(0, edSel - 1); saveRhythms(); renderEdList(); loadEd(); };
+$("edPlay").onclick = function(){
+  if (PB){ stopPlayback(true); this.textContent = "▶ Preview"; return; }
+  var me = this; this.textContent = "■ Stop";
+  play(edDrawn, {bpm:G ? G.tempo : 80, passes:1, click:true, model:true, onEnd:function(){ me.textContent = "▶ Preview"; }});
+};
+$("edReset").onclick = function(){
+  if (!confirm("Put the built-in rhythms back? Your own rhythms stay; edited built-ins go back to the original.")) return;
+  var mine = rhythms.filter(function(r){ return !DEFAULT_RHYTHMS.some(function(d){ return d.id === r.id; }); });
+  rhythms = JSON.parse(JSON.stringify(DEFAULT_RHYTHMS)).concat(mine); edSel = 0; saveRhythms(); renderEdList(); loadEd();
+};
+$("edExport").onclick = function(){ $("ioTitle").textContent = "Export rhythms (copy this, then Import on another device)"; $("ioText").value = JSON.stringify(rhythms, null, 1); $("ioOk").textContent = "Close"; $("ioModal").classList.add("show"); $("ioModal").setAttribute("data-mode", "export"); };
+$("edImport").onclick = function(){ $("ioTitle").textContent = "Import rhythms (paste exported text; replaces the whole list)"; $("ioText").value = ""; $("ioOk").textContent = "Import"; $("ioModal").classList.add("show"); $("ioModal").setAttribute("data-mode", "import"); };
+$("ioCopy").onclick = function(){ $("ioText").select(); try{ document.execCommand("copy"); toast("Copied"); }catch(e){} };
+$("ioOk").onclick = function(){
+  var m = $("ioModal");
+  if (m.getAttribute("data-mode") === "import"){
+    try{
+      var a = JSON.parse($("ioText").value);
+      if (!Array.isArray(a) || !a.length) throw 0;
+      a = a.filter(function(r){ return r && r.pattern && r.time; }).map(function(r){ return {id:String(r.id || newId()), name:String(r.name || "Rhythm"), tag:String(r.tag || ""), time:String(r.time), pattern:String(r.pattern)}; });
+      if (!a.length) throw 0;
+      rhythms = a; edSel = 0; saveRhythms(); renderEdList(); loadEd(); toast("Imported " + a.length + " rhythms");
+    }catch(e){ toast("That text didn't look like an export."); return; }
+  }
+  m.classList.remove("show");
+};
+
+/* ======================= keyboard ======================= */
+document.addEventListener("keydown", function(e){
+  if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+  if (current === "rhythm"){
+    if (e.code === "Space"){ e.preventDefault(); togglePlay(); }
+    else if (e.key === "e" || e.key === "E") startMeeting();
+    else if (e.key === "ArrowRight") $("nextRh").click();
+    else if (e.key === "ArrowLeft") $("prevRh").click();
+  } else if (current === "rules"){
+    if (e.key === "ArrowRight" || e.code === "Space"){ e.preventDefault(); $("ruleNext").click(); }
+    else if (e.key === "ArrowLeft") $("rulePrev").click();
+  }
+});
+
+/* ======================= boot ======================= */
+window.SUS = {encodeCode:encodeCode, decodeCode:decodeCode, imposters:imposters, parseRhythm:parseRhythm, countLabel:countLabel, DEFAULT_RHYTHMS:DEFAULT_RHYTHMS, cleanCode:cleanCode, VERSION:VERSION,
+  state:function(){ return G; }, meeting:function(){ return MT; }};
+applyTheme(); applySound(); renderHome();
+var qs = /[?&]role=([^&]*)/.exec(location.search);
+if (qs) openRole(decodeURIComponent(qs[1]));
+else if (/[?&]teacher/.test(location.search)) openSetup();
+else show("home");
+})();
+</script>
+</body>
+</html>
