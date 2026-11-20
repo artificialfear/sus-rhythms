@@ -47,8 +47,16 @@ label.f{display:block;margin:8px 0 2px;font-weight:600;font-size:.92em}
 .topbar .btn{margin:0 0 0 6px;padding:.35em .6em;border-radius:10px}
 /* ---------- home ---------- */
 .hero{max-width:980px;margin:4vh auto 0;text-align:center}
-.title{font-size:clamp(2.4rem,7vw,5.2rem);font-weight:900;line-height:1;margin:.2em 0 .1em;font-family:"Trebuchet MS","Arial Rounded MT Bold",sans-serif;letter-spacing:2px;text-shadow:0 4px 0 rgba(0,0,0,.35)}
-.title .r{color:var(--red)}
+.title{font-size:clamp(3rem,9.6vw,10rem);font-weight:900;line-height:.9;margin:.15em 0 .3em;font-family:"Arial Black","Segoe UI Black",Impact,"Trebuchet MS",sans-serif;letter-spacing:.03em;transform:rotate(-3deg);white-space:nowrap}
+.title .w{display:inline-block;margin:0 .12em}
+.title .w > span{display:inline-block;animation:beat 2.4s ease-in-out infinite}
+.title .s > span{color:#ffffff;-webkit-text-stroke:.04em #0b1030;text-shadow:0 .03em 0 #c9d2ff,0 .06em 0 #9aa6cc,0 .09em 0 #6b7599,0 .12em 0 #3d4566,0 .15em 0 #1d2340,0 .2em .25em rgba(0,0,0,.55)}
+.title .r > span{color:#ff3b41;-webkit-text-stroke:.04em #2a0204;text-shadow:0 .03em 0 #d8262c,0 .06em 0 #b01a20,0 .09em 0 #8a1116,0 .12em 0 #5e090d,0 .15em 0 #3a0407,0 .2em .25em rgba(0,0,0,.55)}
+@keyframes beat{0%,8%,100%{transform:translateY(0) scale(1)}4%{transform:translateY(-.1em) scale(1.06)}}
+.title-notes{color:var(--gold);font-size:clamp(1.2rem,3vw,2rem);letter-spacing:.5em;margin-top:-.2em;opacity:.9}
+.title-notes span{display:inline-block;margin:0 .3em}
+@media (prefers-reduced-motion:reduce){.title .w > span{animation:none}}
+@media (max-width:900px){.title{font-size:clamp(3rem,17vw,9rem);white-space:normal}.title .w{display:block;margin:0}}
 .subtitle{color:var(--gold);font-weight:800;letter-spacing:3px;text-transform:uppercase}
 .crew-line{margin:14px auto 6px;height:150px;white-space:nowrap;overflow:hidden}
 .crew-line svg{height:140px;width:auto;margin:0 -6px;vertical-align:bottom}
@@ -188,7 +196,8 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
 <section class="screen" id="home">
   <div class="hero">
     <div class="subtitle">Raven Band Edition</div>
-    <div class="title">SUS <span class="r">RHYTHMS</span></div>
+    <div class="title" aria-label="Sus Rhythms"><span class="w s"><span style="animation-delay:0.00s">S</span><span style="animation-delay:0.18s">U</span><span style="animation-delay:0.36s">S</span></span><span class="w r"><span style="animation-delay:0.54s">R</span><span style="animation-delay:0.72s">H</span><span style="animation-delay:0.90s">Y</span><span style="animation-delay:1.08s">T</span><span style="animation-delay:1.26s">H</span><span style="animation-delay:1.44s">M</span><span style="animation-delay:1.62s">S</span></span></div>
+    <div class="title-notes" aria-hidden="true"><span>♩</span><span>♫</span><span>♩</span><span>𝄽</span><span>♫</span><span>♩</span></div>
     <div class="muted" style="font-size:1.15em">Clap the rhythm. Find the imposters. Don't get ejected.</div>
     <div class="crew-line" id="homeCrew"></div>
     <div class="row" style="justify-content:center;margin-top:10px">
@@ -218,7 +227,7 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
 <!-- ================= SETUP ================= -->
 <section class="screen" id="setup">
   <div class="wrap">
-    <h1>Sus Rhythms <span class="muted" style="font-size:.55em">· Game setup · v1.0.0</span></h1>
+    <h1>Sus Rhythms <span class="muted" style="font-size:.55em">· Game setup · v1.0.1</span></h1>
     <div id="resumeBox"></div>
     <div class="grid2">
       <div class="panel">
@@ -390,7 +399,7 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
 <script>
 (function(){
 "use strict";
-var VERSION = "1.0.0";
+var VERSION = "1.0.1";
 var APP_URL = "https://artificialfear.github.io/sus-rhythms/";
 
 /* ======================= helpers ======================= */
