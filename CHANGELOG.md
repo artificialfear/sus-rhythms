@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 — 2026-11-20
+- **Play on iPads.** Students join with the game code and their number. Their iPad follows the game: the current rhythm, the Emergency Meeting, the suspects, the result, and who won.
+- **Nominate on iPads.** At each meeting, everyone still in taps who's most sus. The top picks become the suspects automatically, and you can still swap anyone.
+- **Vote on iPads.** Votes are locked once they're in (no changing). The board counts them, and you can add hand votes for students without an iPad.
+- **Emergency Meeting button on iPads**, once per student per game. The board shows "Jade wants an Emergency Meeting" and you choose Start or Ignore.
+- The lobby shows who has joined (✓). Tap a ✓ name to let that student rejoin from a different iPad.
+- **Hand signals are the fallback.** If the iPads can't connect, the board says "iPads offline: use hands" and the game runs like before.
+- Voting countdown default is now 15 seconds, and there's a new "Nomination time" setting (20 seconds).
+- Needs the Sus Rhythms relay deployed once (see relay/README.md).
+
 ## 1.1.0 — 2026-11-20
 - New **Load all blocks from Band Ninja** button in Setup. After a Google sign-in, it fills the 1st, 3rd, 4th, 6th and 7th Block rosters from the Band Ninja Tracker in one step. 3rd and 4th Block each get their own list.
 - Names show as "First L." (first name + last initial), sorted A–Z. When two students would look the same, more of the last name is shown.

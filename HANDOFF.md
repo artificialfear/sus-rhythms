@@ -7,6 +7,7 @@ This is the web version of Mat's "Among Us Rhythm Game" slideshow, his social-de
 ## Files
 - `index.html`: the whole app (HTML/CSS/JS). There is no build step.
 - `lib/vexflow-bravura.js` (VexFlow 4.2.3) and `lib/qrcode.js` are copied from Grudgeball and bundled locally for the school network.
+- `relay/`: the Apps Script relay for live iPad play (Code.gs + README with deploy steps).
 - `tests/smoke.py`: Playwright smoke test. Run `python3 tests/smoke.py [--shots DIR]`. It covers the code/role logic fuzz, the counting labels, all default rhythms, a full game to a crew win and to an imposter win, undo, reload/resume, the editor, the student role page (lock, hold-to-reveal), and the ViewBoard CSS/JS limits.
 
 ## Decisions (Mat, 2026-11-20)
@@ -35,6 +36,15 @@ This is the web version of Mat's "Among Us Rhythm Game" slideshow, his social-de
 - An empty tab keeps the old list. Absent marks are kept for names that are still on the roster. A hand edit clears the "came from Band Ninja" note.
 - Test: smoke.py mocks `google.accounts.oauth2` and routes sheets.googleapis.com with fictional names.
 - Unverified: whether the GIS sign-in popup works in the ViewBoard's browser. If it doesn't, load the rosters on a laptop and play there, or paste the names.
+
+## Live iPad play (v1.2.0)
+Mat's choices (2026-11-20): Apps Script relay; iPad nominations pick the suspects (top `sus` by count, teacher can swap); students request an Emergency Meeting (once per game) and the teacher approves; the board shows vote **counts only** (the board receives who-voted-what from the relay but never displays it).
+- **Relay:** `relay/Code.gs`, a standalone Apps Script web app (Execute as Me, access Anyone) on Mat's personal Gmail. CacheService only (TTL 6 h). Keys: `h:CODE` board secret (first board to publish claims the code), `s:CODE` public state JSON (relay stamps `_t`), `c:CODE:N` device claim, `seen:CODE:N`, `v:CODE:MID:N` vote (locked once set), `nm:CODE:MID:N` nomination (changeable), `sos:CODE:N` (once per game). LockService is used only for joins. Actions: ping, host (POST), poll, reset, join, state, vote, nom, sos.
+- **Not deployed yet:** `RELAY_URL` in index.html is empty. Until Mat sends the /exec URL, he can paste it under Setup → Live iPad connection (saved as `sus.relay`), and the QR link then carries it as `&x=`. Typed links only work once `RELAY_URL` is set.
+- **Board:** `publish(phase)` posts the state on every phase change (lobby, rhythm, meeting, nominate, pick, defense, vote, tally, eject, end), one request in flight at a time with a retry. `pollLoop` polls every 3 s (1.5 s during nominate/vote) for `seen`/`joined`/`sos`/`votes`/`noms`. `liveReady()` = live, the last poll OK, and at least 1 iPad seen → the meeting starts with nominations; otherwise the teacher picks. After voting closes the board waits 1.2 s, polls once more, and `MT.dev` → `MT.votes` (hand +/− adds on top). A re-vote makes a new meeting id.
+- **iPad:** the `SP` player object; `sus.player` remembers code+number for auto-rejoin after a refresh; `sus.dev` = device id. It polls every 2 s in meeting phases and 4 s otherwise (plus jitter), and countdowns use relay time (`res.t − st._t`). Two failed polls → "Can't reach the game… vote with your hand."
+- **Tests:** `node tests/relay.test.js` (relay unit tests, Apps Script mocks in tests/relay-harness.js); `python3 tests/live.py` (board + 3 iPads through the real Code.gs via tests/relay-server.js, including relay outage → hand fallback → recovery); `python3 tests/smoke.py` (hands-only game).
+- **Unverified on real hardware:** the Apps Script latency/quota with about 30 iPads, and the ViewBoard browser.
 
 ## Device storage (localStorage, per device)
 `sus.classes` (rosters, absent list, rules, rhythm picks per class), `sus.cls`, `sus.rhythms`, `sus.game` (game in progress; resume from Setup), `sus.view`, `sus.theme`, `sus.sound`, `sus.lock.<CODE>` (student devices). Rhythms move between devices with Export/Import in the editor. Rosters stay on the ViewBoard only, and no student names are in the repo.

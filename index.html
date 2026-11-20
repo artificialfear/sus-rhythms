@@ -182,6 +182,26 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
 .modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:90;display:none;align-items:center;justify-content:center;padding:20px}
 .modal.show{display:flex}
 .modal .panel{max-width:620px;width:100%;max-height:90vh;overflow:auto}
+.livebadge{display:inline-block;border-radius:12px;padding:.35em .8em;margin:3px 6px 3px 0;font-weight:700;border:1px solid var(--line);background:var(--panel)}
+.livebadge.ok{color:#3ccf7a}.livebadge.bad{color:#ffb4b4}
+.sosbar{display:none;background:#5a0004;border:2px solid var(--red);color:#fff;border-radius:14px;padding:10px 14px;margin:0 0 10px;font-weight:800;font-size:1.15em;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.sosbar.show{display:flex}
+.nomcount{font-size:1.4em;font-weight:800;text-align:center;margin:6px 0}
+.nombadge{position:absolute;right:8px;bottom:6px;font-size:.75em;color:var(--gold)}
+.roster .j{color:#3ccf7a;font-weight:900;margin-left:4px}
+.roster .tapme{cursor:pointer}
+/* student live */
+#rLive{display:none}
+.lstat{background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:16px;margin-top:14px;text-align:center}
+.lstat h2{font-size:1.7em;margin:.1em 0 .3em}
+.lstat .tm{font-size:2.6em;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;grid-gap:8px;margin-top:10px}
+.lgrid button{font-size:1.1em;font-weight:800;padding:.8em .4em;border-radius:14px;border:2px solid var(--line);background:var(--panel2)}
+.lgrid button.sel{border-color:var(--gold);background:rgba(245,197,66,.25)}
+.lgrid button .lt{color:var(--gold);margin-right:.35em}
+.lgrid button.skip{grid-column:1 / -1}
+.lconn{font-size:.85em;margin-top:10px}
+.outbar{background:#3a2a00;border:2px solid var(--gold);border-radius:12px;padding:8px;margin-top:10px;font-weight:800}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel);border:2px solid var(--gold);border-radius:12px;padding:.6em 1em;z-index:99;display:none;font-weight:700}
 .toast.show{display:block}
 </style>
@@ -203,7 +223,7 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
     <div class="muted" style="font-size:1.15em">Clap the rhythm. Find the imposters. Don't get ejected.</div>
     <div class="crew-line" id="homeCrew"></div>
     <div class="row" style="justify-content:center;margin-top:10px">
-      <button class="btn primary big" id="goRole">🔒 Check my secret role</button>
+      <button class="btn primary big" id="goRole">📱 Join the game (students)</button>
       <button class="btn big" id="goTeacher">🎛️ Run the game (teacher)</button>
     </div>
   </div>
@@ -212,24 +232,32 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
 <!-- ================= STUDENT ROLE ================= -->
 <section class="screen" id="role">
   <div class="role-wrap">
-    <h1>Check your secret role</h1>
-    <p class="muted">Type the game code from the board and your number. Don't let anyone see your screen!</p>
-    <label class="f" for="rCode">Game code</label>
-    <input id="rCode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC-123">
-    <label class="f" for="rNum">Your number</label>
-    <input id="rNum" type="number" inputmode="numeric" min="1" max="63" placeholder="12">
-    <div id="rMsg" class="warn" style="min-height:1.4em;margin-top:6px"></div>
-    <button class="holdbtn" id="holdBtn">Press and HOLD to see your role</button>
-    <div class="rolecard" id="roleCard"></div>
-    <p class="muted" style="margin-top:22px;font-size:.9em">Let go and your role hides again. You can only check one number on this device per game.</p>
-    <button class="btn small" id="roleHome">← Back</button>
+    <div id="rForm">
+      <h1>Join the game</h1>
+      <p class="muted">Type the game code from the board and your number. Don't let anyone see your screen!</p>
+      <label class="f" for="rCode">Game code</label>
+      <input id="rCode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC-123">
+      <label class="f" for="rNum">Your number</label>
+      <input id="rNum" type="number" inputmode="numeric" min="1" max="63" placeholder="12">
+      <div id="rMsg" class="warn" style="min-height:1.4em;margin-top:6px"></div>
+      <button class="holdbtn" id="joinBtn">Join game →</button>
+      <p class="muted" style="margin-top:18px;font-size:.9em">You can only join with one number on this device per game.</p>
+      <button class="btn small" id="roleHome">← Back</button>
+    </div>
+    <div id="rLive">
+      <div style="font-size:1.25em;font-weight:800" id="rWho"></div>
+      <div class="lstat" id="rStatus"></div>
+      <button class="holdbtn" id="holdBtn">Press and HOLD to see your secret role</button>
+      <div class="rolecard" id="roleCard"></div>
+      <div class="lconn muted" id="rConn"></div>
+    </div>
   </div>
 </section>
 
 <!-- ================= SETUP ================= -->
 <section class="screen" id="setup">
   <div class="wrap">
-    <h1>Sus Rhythms <span class="muted" style="font-size:.55em">· Game setup · v1.1.0</span></h1>
+    <h1>Sus Rhythms <span class="muted" style="font-size:.55em">· Game setup · v1.2.0</span></h1>
     <div id="resumeBox"></div>
     <div class="grid2">
       <div class="panel">
@@ -263,7 +291,14 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
           <div><label class="f">Times through each rhythm</label><input id="sPass" type="number" class="num" min="1" max="4"></div>
           <div><label class="f">Tempo (BPM)</label><input id="sTempo" type="number" class="num" min="40" max="200" step="2"></div>
           <div><label class="f">Reveal role when ejected</label><select id="sReveal"><option value="1">Yes</option><option value="0">No (harder)</option></select></div>
+          <div><label class="f">Play on iPads</label><select id="sLive"><option value="1">Yes: nominate &amp; vote on iPads</option><option value="0">No: hands only</option></select></div>
+          <div><label class="f">Nomination time (seconds)</label><input id="sNom" type="number" class="num" min="5" max="90"></div>
         </div>
+        <details id="liveSetup" style="margin-top:8px"><summary class="muted" style="cursor:pointer;font-size:.9em">Live iPad connection</summary>
+          <div class="muted" style="font-size:.9em">The /exec link of your Sus Rhythms relay (Apps Script web app). See relay/README.md in the repo.</div>
+          <input id="relayUrl" style="width:100%;margin-top:4px" spellcheck="false" placeholder="https://script.google.com/macros/s/…/exec">
+          <div class="row" style="margin:6px -4px 0"><button class="btn small" id="relaySave">Save</button><button class="btn small" id="relayTest">Test connection</button><span id="relayMsg" class="muted" style="font-size:.9em"></span></div>
+        </details>
         <div id="ruleWarn" class="warn" style="margin-top:8px"></div>
       </div>
     </div>
@@ -280,20 +315,21 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
   <div class="wrap">
     <div class="grid2" style="grid-template-columns:1.1fr 1fr">
       <div class="panel center">
-        <h2>Check your secret role</h2>
+        <h2>Join on your iPad</h2>
         <div class="row" style="justify-content:center;align-items:center">
           <div class="qr" id="qr"></div>
           <div style="text-align:left;margin-left:14px">
             <div class="muted">On your iPad, go to</div>
             <div style="font-weight:800;font-size:1.15em;word-break:break-all" id="joinUrl"></div>
-            <div class="muted" style="margin-top:6px">tap <b>Check my secret role</b> and type</div>
+            <div class="muted" style="margin-top:6px">tap <b>Join the game</b> and type</div>
           </div>
         </div>
         <div class="codebox" id="lobbyCode" style="margin-top:10px"></div>
         <div class="muted" style="margin-top:4px">plus <b>your number</b> from the list →</div>
       </div>
       <div class="panel">
-        <h3>Find your number</h3>
+        <div class="row" style="justify-content:space-between;margin:0"><h3 style="margin:0">Find your number</h3><span class="livebadge" id="lobbyLive" style="display:none"></span></div>
+        <div class="muted" id="lobbyHint" style="font-size:.85em;margin:2px 0 6px;display:none">✓ = joined on an iPad. Tap a ✓ name to let that student rejoin from a different iPad.</div>
         <div class="roster" id="lobbyRoster"></div>
       </div>
     </div>
@@ -316,6 +352,7 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
 <!-- ================= RHYTHM ================= -->
 <section class="screen" id="rhythm">
   <div class="hud" id="hud"></div>
+  <div class="sosbar" id="sosBar"><span id="sosTxt"></span><span><button class="btn danger" id="sosGo">🚨 Start meeting</button><button class="btn" id="sosNo">Ignore</button></span></div>
   <div class="rh-layout">
     <div>
       <div class="rh-head"><h1 id="rhTitle">Rhythm 1</h1><span class="muted" id="rhSub"></span></div>
@@ -411,8 +448,9 @@ code.k{background:var(--bg2);padding:.05em .35em;border-radius:6px;border:1px so
 <script>
 (function(){
 "use strict";
-var VERSION = "1.1.0";
+var VERSION = "1.2.0";
 var APP_URL = "https://artificialfear.github.io/sus-rhythms/";
+var RELAY_URL = "";   // default Apps Script /exec URL for the live relay (set after deploying relay/Code.gs)
 
 /* ======================= helpers ======================= */
 function $(id){ return document.getElementById(id); }
@@ -718,7 +756,7 @@ var CLASSES = [
   {id:"b7", name:"7th Block · 6th Grade Beginning"},
   {id:"x",  name:"Other / practice"}
 ];
-var DEF_SET = {k:5, thr:10, sus:4, def:60, vote:10, pass:2, tempo:80, reveal:1};
+var DEF_SET = {k:5, thr:10, sus:4, def:60, vote:15, pass:2, tempo:80, reveal:1, live:1, nom:20};
 var rhythms = load("sus.rhythms", null) || JSON.parse(JSON.stringify(DEFAULT_RHYTHMS));
 var classData = load("sus.classes", {});
 var clsId = load("sus.cls", "b1");
@@ -757,10 +795,15 @@ function renderHome(){
 $("goRole").onclick = function(){ openRole(""); };
 $("goTeacher").onclick = function(){ openSetup(); };
 
-/* ======================= STUDENT ROLE ======================= */
-function openRole(code){
+/* ======================= STUDENT (iPad) ======================= */
+var SP = null;   // {code, no, info, dv, url, joined, st, mine, recv, srvT, sel, fails, timer, tick, stop}
+function openRole(code, relay){
   if (code) $("rCode").value = fmtCode(cleanCode(code));
+  if (relay) save("sus.relay", relay === RELAY_URL ? "" : relay);
   $("roleCard").className = "rolecard"; $("rMsg").textContent = "";
+  $("rForm").style.display = ""; $("rLive").style.display = "none";
+  var saved = load("sus.player", null);   // rejoin after a refresh
+  if (saved && cleanCode($("rCode").value || saved.code) === saved.code && decodeCode(saved.code)){ $("rCode").value = fmtCode(saved.code); $("rNum").value = saved.no; startPlayer(); }
   show("role");
 }
 $("roleHome").onclick = function(){ history.replaceState(null, "", location.pathname); show("home"); };
@@ -770,10 +813,147 @@ function roleCheck(){
   if (!info) return {err:"That game code doesn't look right. Check the board and try again."};
   if (!(num >= 1 && num <= info.n)) return {err:"Your number should be between 1 and " + info.n + "."};
   var key = "sus.lock." + cleanCode($("rCode").value), lock = load(key, null);
-  if (lock != null && lock !== num) return {err:"This device already checked number " + lock + " for this game. Ask your teacher if that's a mistake."};
+  if (lock != null && lock !== num) return {err:"This device already joined as number " + lock + " for this game. Ask your teacher if that's a mistake."};
   save(key, num);
-  return {imp:imposters(info.seed, info.n, info.k).indexOf(num) >= 0, num:num, k:info.k};
+  return {imp:imposters(info.seed, info.n, info.k).indexOf(num) >= 0, num:num, k:info.k, info:info};
 }
+$("joinBtn").onclick = function(){ startPlayer(); };
+function devId(){ var d = load("sus.dev", null); if (!d){ d = "d" + randTok(14); save("sus.dev", d); } return d; }
+function startPlayer(){
+  var r = roleCheck();
+  if (r.err){ $("rMsg").textContent = r.err; return; }
+  stopPlayer();
+  var code = cleanCode($("rCode").value);
+  SP = {code:code, no:r.num, info:r.info, dv:devId(), url:relayUrl(), joined:false, st:null, mine:{}, recv:0, srvT:0, sel:null, fails:0, timer:null, tick:null};
+  save("sus.player", {code:code, no:r.num});
+  $("rForm").style.display = "none"; $("rLive").style.display = "block";
+  $("rWho").textContent = "You are #" + r.num;
+  renderPlayer();
+  if (SP.url) spPoll(); else spConn("No live connection set up, so vote with your hand.", true);
+  SP.tick = setInterval(function(){ var el = $("spTimer"); if (el) el.textContent = fmtTime(spLeft()); }, 250);
+}
+function stopPlayer(){ if (SP){ clearTimeout(SP.timer); clearInterval(SP.tick); SP.stop = true; } }
+function spConn(t, bad){ var el = $("rConn"); el.textContent = t; el.className = "lconn " + (bad ? "warn" : "muted"); }
+function spCall(params){
+  var p = {r:SP.code, p:SP.no, dv:SP.dv}; for (var k in params) p[k] = params[k];
+  return relayCall(p, SP.url);
+}
+function spPoll(){
+  if (!SP || SP.stop) return;
+  var me = SP;
+  spCall({a:me.joined ? "state" : "join"}).then(function(res){
+    if (me !== SP || me.stop) return;
+    if (!res || (!res.ok && res.err !== "taken" && res.err !== "claim")){ me.fails++; spConn(me.fails >= 2 ? "Can't reach the game right now. Follow the board and vote with your hand." : "Connecting…", me.fails >= 2); }
+    else if (res.err === "taken"){ spConn("Number " + me.no + " is already playing on another iPad. Ask your teacher to reset it.", true); me.timer = setTimeout(spPoll, 8000); return; }
+    else if (res.err === "claim"){ me.joined = false; }
+    else if (res.ok){
+      me.fails = 0; me.joined = true;
+      var prevPhase = me.st && me.st.phase, prevMid = me.st && me.st.mid;
+      if (res.st){ me.st = res.st; me.mine = res.mine || {}; me.recv = Date.now(); me.srvT = res.t || 0; }
+      if (!me.st || me.st.mid !== prevMid || me.st.phase !== prevPhase) me.sel = null;
+      spConn("● Connected", false);
+      renderPlayer();
+    }
+    var ph = me.st && me.st.phase, fast = ph === "nominate" || ph === "vote" || ph === "meeting" || ph === "pick" || ph === "defense";
+    me.timer = setTimeout(spPoll, (fast ? 2000 : 4000) + Math.floor(Math.random() * 600) + (me.fails ? 2000 : 0));
+  });
+}
+function spLeft(){
+  if (!SP || !SP.st) return 0;
+  var st = SP.st, lag = st._t && SP.srvT ? (SP.srvT - st._t) / 1000 : 0;
+  if (st.paused) return st.left || 0;
+  return Math.max(0, (st.left || 0) - lag - (Date.now() - SP.recv) / 1000);
+}
+function spName(no){ var st = SP.st; return (st && st.names && st.names[no]) || ("#" + no); }
+function renderPlayer(){
+  if (!SP) return;
+  var st = SP.st, box = $("rStatus"), h = "", me = SP.no, L = "ABCD";
+  var alive = st && st.alive ? st.alive.indexOf(me) >= 0 : true;
+  if (st && st.names && st.names[me] && st.names[me] !== "#" + me) $("rWho").textContent = "You are #" + me + " · " + st.names[me];
+  var ph = st ? st.phase : "wait";
+  if (!SP.url || !st || ph === "lobby" || ph === "wait"){
+    h = "<h2>You're in! 👋</h2><div>Check your secret role below, then watch the board.</div>";
+  } else if (ph === "rhythm"){
+    h = "<h2>🎵 " + esc(st.rh || "Rhythm") + "</h2><div>Eyes on the board. Clap along!</div>";
+    if (alive){
+      if (SP.mine.sos) h += '<div class="muted" style="margin-top:10px">You already used your Emergency Meeting this game.</div>';
+      else h += '<button class="btn danger big" id="spSos" style="margin-top:12px;width:100%">🚨 Emergency Meeting</button><div class="muted" style="font-size:.85em">One per game. Your teacher decides whether to start it.</div>';
+    }
+  } else if (ph === "meeting"){
+    h = "<h2>🚨 EMERGENCY MEETING!</h2><div>Get ready to find the imposters.</div>";
+  } else if (ph === "nominate"){
+    h = "<h2>Who's most sus?</h2><div class='tm' id='spTimer'>" + fmtTime(spLeft()) + "</div>";
+    if (!alive) h += "<div>You're out, so you can't nominate. Keep listening!</div>";
+    else {
+      var cur = SP.sel || SP.mine.nom || 0;
+      h += "<div>" + (cur ? "You nominated <b>" + esc(spName(cur)) + "</b>" + (/\.$/.test(spName(cur)) ? "" : ".") + " You can change it until time runs out." : "Tap the player you think is an imposter.") + "</div>";
+      h += '<div class="lgrid">' + st.alive.filter(function(n){ return n !== me; }).map(function(n){ return '<button data-nom="' + n + '" class="' + (n === cur ? "sel" : "") + '"><span class="lt">' + n + "</span>" + esc(G_or(st, n)) + "</button>"; }).join("") + "</div>";
+    }
+  } else if (ph === "pick"){
+    h = "<h2>Choosing the suspects…</h2>" + susList(st);
+  } else if (ph === "defense"){
+    h = "<h2>Listen to the suspects!</h2><div class='tm' id='spTimer'>" + fmtTime(spLeft()) + "</div>" + susList(st);
+  } else if (ph === "vote"){
+    h = "<h2>VOTE!</h2><div class='tm' id='spTimer'>" + fmtTime(spLeft()) + "</div>";
+    if (!alive) h += "<div>You're out, so you can't vote.</div>";
+    else if (SP.mine.vote){
+      h += "<div style='font-size:1.2em'>You voted for <b>" + esc(SP.mine.vote === "skip" ? "Skip" : spName(+SP.mine.vote)) + "</b> 🔒</div><div class='muted'>Votes are locked. No changes!</div>";
+    } else {
+      var sel = SP.sel;
+      h += '<div class="lgrid">' + (st.sus || []).map(function(n, i){ return '<button data-vote="' + n + '" class="' + (String(n) === String(sel) ? "sel" : "") + '"><span class="lt">' + L[i] + "</span>" + esc(spName(n)) + "</button>"; }).join("") +
+        '<button data-vote="skip" class="skip' + (sel === "skip" ? " sel" : "") + '">✊ Skip</button></div>';
+      h += '<button class="btn primary big" id="spLock" style="margin-top:12px;width:100%"' + (sel ? "" : " disabled") + ">" + (sel ? "Lock in my vote 🔒" : "Pick one, then lock it in") + "</button>";
+    }
+  } else if (ph === "tally"){
+    h = "<h2>Voting closed</h2><div>Look at the board!</div>";
+  } else if (ph === "eject"){
+    var ej = st.ej || {};
+    if (!ej.no) h = "<h2>No one was ejected.</h2>";
+    else if (ej.no === me) h = "<h2>You were ejected! 🚀</h2><div>You're out of the vote, but you still clap every rhythm.</div>";
+    else h = "<h2>" + esc(ej.name) + " was ejected.</h2>" + (ej.imp === true ? "<div>They <b>were</b> an Imposter!</div>" : ej.imp === false ? "<div>They were <b>not</b> an Imposter.</div>" : "");
+    if (ej.left != null) h += "<div class='muted' style='margin-top:6px'>" + ej.left + (ej.left === 1 ? " Imposter remains." : " Imposters remain.") + "</div>";
+  } else if (ph === "end"){
+    var imp = imposters(SP.info.seed, SP.info.n, SP.info.k).indexOf(me) >= 0;
+    var win = st.over === "crew" ? "CREWMATES WIN!" : st.over === "imp" ? "IMPOSTERS WIN!" : "GAME OVER";
+    var mineWon = (st.over === "crew" && !imp) || (st.over === "imp" && imp);
+    h = "<h2>" + win + "</h2><div>You were " + (imp ? "an <b>Imposter</b>" : "a <b>Crewmate</b>") + "." + (st.over === "crew" || st.over === "imp" ? (mineWon ? " Your team won! 🎉" : " Better luck next game!") : "") + "</div>";
+    if (st.imps && st.imps.length) h += "<div class='muted' style='margin-top:8px'>The Imposters were " + esc(endDot(st.imps.join(", "))) + "</div>";
+  }
+  if (st && !alive && ph !== "end" && !(ph === "eject" && st.ej && st.ej.no === me)) h += '<div class="outbar">You\'re out, but keep clapping! 👏</div>';
+  box.innerHTML = h;
+}
+function endDot(t){ t = String(t); return /[.!?]$/.test(t) ? t : t + "."; }
+function G_or(st, n){ return (st.names && st.names[n]) || ("#" + n); }
+function susList(st){ var L = "ABCD"; return '<div style="margin-top:8px">' + (st.sus || []).map(function(n, i){ return "<div style='font-size:1.15em;margin:3px 0'><b style='color:var(--gold)'>" + L[i] + "</b> · " + esc(spName(n)) + "</div>"; }).join("") + "</div>"; }
+$("rStatus").onclick = function(e){
+  var t = e.target.closest ? e.target.closest("button") : null; if (!t || !SP || t.disabled) return;
+  var nom = t.getAttribute("data-nom"), vote = t.getAttribute("data-vote");
+  if (nom){
+    SP.sel = +nom; renderPlayer();
+    spCall({a:"nom", m:SP.st.mid, v:nom}).then(function(r){ if (r && r.ok){ SP.mine.nom = r.nom; SP.sel = null; renderPlayer(); } else if (r && r.err === "closed") toast("Nominations are closed."); else if (!r) toast("Couldn't send. Try again!"); });
+    return;
+  }
+  if (vote){ SP.sel = vote; renderPlayer(); return; }
+  if (t.id === "spLock"){
+    var v = SP.sel; t.disabled = true; t.textContent = "Sending…";
+    spCall({a:"vote", m:SP.st.mid, v:v}).then(function(r){
+      if (r && r.ok){ SP.mine.vote = r.vote; SP.sel = null; if (r.locked) toast("You already voted."); }
+      else if (r && r.err === "closed") toast("Voting is closed. Use your hand!");
+      else toast("Couldn't send your vote. Try again, or hold up your hand.");
+      renderPlayer();
+    });
+  }
+  if (t.id === "spSos"){
+    if (!confirm("Call an Emergency Meeting? You only get one per game.")) return;
+    t.disabled = true;
+    spCall({a:"sos"}).then(function(r){
+      if (r && r.ok){ SP.mine.sos = true; toast("Sent! Your teacher will see it."); }
+      else if (r && r.err === "used"){ SP.mine.sos = true; toast("You already used yours."); }
+      else toast("Couldn't send. Try again.");
+      renderPlayer();
+    });
+  }
+};
 function holdOn(e){
   if (e) e.preventDefault();
   var r = roleCheck(), c = $("roleCard");
@@ -816,6 +996,7 @@ function fillSetup(){
   $("roster").value = c.roster; $("nOnly").value = c.nOnly;
   $("sK").value = c.set.k; $("sThr").value = c.set.thr; $("sSus").value = c.set.sus; $("sDef").value = c.set.def;
   $("sVote").value = c.set.vote; $("sPass").value = c.set.pass; $("sTempo").value = c.set.tempo; $("sReveal").value = String(c.set.reveal);
+  $("sLive").value = String(c.set.live); $("sNom").value = c.set.nom; $("relayUrl").value = relayUrl();
   renderPresent(); renderRhPick(); validateSetup(); renderBn();
 }
 function renderPresent(){
@@ -849,9 +1030,9 @@ $("rhNone").onclick = function(){ cd().rh = []; saveClasses(); renderRhPick(); v
 $("clsSel").onchange = function(){ clsId = this.value; save("sus.cls", clsId); fillSetup(); };
 $("roster").oninput = function(){ var c = cd(); c.roster = this.value; if (c.bnAt){ c.bnAt = 0; $("bnInfo").textContent = "Edited by hand."; } var names = rosterNames(c); c.absent = c.absent.filter(function(n){ return names.indexOf(n) >= 0; }); saveClasses(); renderPresent(); validateSetup(); };
 $("nOnly").oninput = function(){ cd().nOnly = Math.max(2, Math.min(63, +this.value || 2)); saveClasses(); renderPresent(); validateSetup(); };
-["sK","sThr","sSus","sDef","sVote","sPass","sTempo","sReveal"].forEach(function(id){
+["sK","sThr","sSus","sDef","sVote","sPass","sTempo","sReveal","sLive","sNom"].forEach(function(id){
   $(id).oninput = $(id).onchange = function(){
-    var c = cd(), map = {sK:"k", sThr:"thr", sSus:"sus", sDef:"def", sVote:"vote", sPass:"pass", sTempo:"tempo", sReveal:"reveal"};
+    var c = cd(), map = {sK:"k", sThr:"thr", sSus:"sus", sDef:"def", sVote:"vote", sPass:"pass", sTempo:"tempo", sReveal:"reveal", sLive:"live", sNom:"nom"};
     c.set[map[id]] = +this.value; saveClasses(); validateSetup();
   };
 });
@@ -882,7 +1063,9 @@ $("startGame").onclick = function(){
   G = {cls:clsId, code:code, n:n, k:s.k, numeric:pp.numeric,
        players:pp.names.map(function(nm, i){ return {no:i + 1, name:pp.numeric ? "Player " + (i + 1) : nm, alive:true}; }),
        order:c.rh.slice(), idx:0, round:1, thr:s.thr, sus:s.sus, def:s.def, vote:s.vote, passes:s.pass, tempo:s.tempo, reveal:!!s.reveal,
-       hist:[], over:null, played:{}, started:Date.now()};
+       hist:[], over:null, played:{}, started:Date.now(),
+       live:!!(s.live && relayUrl()), relay:relayUrl(), secret:randTok(20), nom:s.nom, sosSeen:{}, called:{}};
+  LV = freshLV();
   saveGame(); openLobby();
 };
 function resumeGame(){ if (!G) return; if (G.over) return showEnd(); goRhythm(); }
@@ -897,6 +1080,7 @@ function hudHTML(){
     '<span class="stat">Players left <b>' + aliveCount() + "</b></span>" +
     (G.reveal ? '<span class="stat">Imposters left <b>' + impsLeft() + "</b></span>" : '<span class="stat">Imposters <b>' + G.k + "</b> <span class='muted'>(roles hidden)</span></span>") +
     '<span class="stat">Ejected <b>' + G.hist.length + "</b></span>" +
+    (G.live ? '<span class="livebadge">' + liveText() + "</span>" : "") +
     "</div>" +
     '<div class="row" style="margin:0"><span class="stat">Code <b>' + fmtCode(G.code) + '</b></span><span class="stat muted">' + esc(clsName(G.cls)) + "</span></div>";
   return h;
@@ -906,22 +1090,34 @@ function hudHTML(){
 function openLobby(){
   stopPlayback(true);
   $("lobbyCode").textContent = fmtCode(G.code);
-  var url = APP_URL + "?role=" + G.code;
+  var url = APP_URL + "?role=" + G.code + (G.live && G.relay !== RELAY_URL ? "&x=" + encodeURIComponent(G.relay) : "");
   $("joinUrl").textContent = APP_URL.replace(/^https?:\/\//, "");
   try{ var q = qrcode(0, "M"); q.addData(url); q.make(); $("qr").innerHTML = q.createSvgTag({cellSize:4, margin:2, scalable:true}); }catch(e){ $("qr").innerHTML = ""; }
-  $("lobbyRoster").innerHTML = G.players.map(function(p){ return '<div class="' + (p.alive ? "" : "out") + '"><b>' + p.no + "</b>" + (G.numeric ? "" : esc(p.name)) + "</div>"; }).join("");
-  if (G.numeric) $("lobbyRoster").innerHTML = '<div class="muted" style="column-span:all">Numbers only this game: use the number your teacher gives you (1–' + G.n + ").</div>";
+  renderLobbyRoster();
+  $("lobbyLive").style.display = G.live ? "" : "none"; $("lobbyHint").style.display = G.live ? "" : "none";
   show("lobby");
+  publish("lobby");
 }
+function renderLobbyRoster(){
+  var j = LV.joined || [];
+  if (G.numeric && !G.live){ $("lobbyRoster").innerHTML = '<div class="muted" style="column-span:all">Numbers only this game: use the number your teacher gives you (1–' + G.n + ").</div>"; return; }
+  $("lobbyRoster").innerHTML = G.players.map(function(p){ var on = j.indexOf(p.no) >= 0; return '<div class="' + (p.alive ? "" : "out") + (on ? " tapme" : "") + '" data-no="' + p.no + '"><b>' + p.no + "</b>" + (G.numeric ? "" : esc(p.name)) + (on ? '<span class="j">✓</span>' : "") + "</div>"; }).join("");
+}
+$("lobbyRoster").onclick = function(e){
+  var d = e.target.closest ? e.target.closest(".tapme") : null; if (!d || !G || !G.live) return;
+  var no = +d.getAttribute("data-no");
+  if (!confirm("Let " + pName(no) + " (#" + no + ") join again from a different iPad?")) return;
+  relayCall({a:"reset", r:G.code, s:G.secret, p:no}).then(function(r){ if (r && r.ok){ LV.joined = LV.joined.filter(function(x){ return x !== no; }); renderLobbyRoster(); toast("#" + no + " can join again."); } else toast("Couldn't reach the iPads."); });
+};
 $("toRules").onclick = function(){ openRules(0, true); };
 $("skipRules").onclick = function(){ goRhythm(); };
 
 /* ======================= RULES ======================= */
 var RULES = [
   {t:"How to Play", fig:function(){ return raven("#3b82f6"); }, li:[
-    "Everyone checks their <b>secret role</b> on their iPad. Most of you are <b>Crewmates</b>. A few of you are <b>Imposters</b>.",
+    "Everyone joins on their iPad and checks their <b>secret role</b>. Most of you are <b>Crewmates</b>. A few of you are <b>Imposters</b>.",
     "A rhythm shows up on the board. After the count-in, we clap it <b>two times</b>.",
-    "After we clap, the teacher calls an <b>Emergency Meeting</b> and picks students to say who they think is most <b>sus</b>.",
+    "After we clap, an <b>Emergency Meeting</b> starts. Everyone nominates who they think is most <b>sus</b>, and the top picks become the suspects.",
     "The suspects get <b>1 minute</b> to argue why they aren't the Imposter.",
     "Then the whole class votes. If you're voted out, you <b>still clap</b> every rhythm!"]},
   {t:"Imposter Rules", fig:function(){ return raven("#e5343a"); }, li:[
@@ -934,11 +1130,11 @@ var RULES = [
     "Listen to everyone around you. Who's messing up the rhythm?",
     "If you're a suspect, defend yourself!",
     "Crewmates win by voting out <b>all {k} Imposters</b>.",
-    "Think you know who it is? You can call your own Emergency Meeting."]},
+    "Think you know who it is? Tap <b>Emergency Meeting</b> on your iPad (once per game). Your teacher decides whether to start it."]},
   {t:"How to Vote", fig:function(){ return bellArt(); }, li:[
-    "The teacher picks up to <b>{sus} suspects</b>. Each gets a letter.",
+    "Nominate on your iPad. The <b>{sus}</b> players with the most nominations become suspects, and each gets a letter.",
     "The suspects argue for <b>{def} seconds</b>.",
-    "When voting opens, hold up your hand: <b>✊ fist = Skip</b>, <b>1 finger = A</b>, <b>2 = B</b>, <b>3 = C</b>, <b>4 = D</b>.",
+    "When voting opens, vote on your iPad. No iPad? Hold up your hand: <b>✊ fist = Skip</b>, <b>1 finger = A</b>, <b>2 = B</b>, <b>3 = C</b>, <b>4 = D</b>.",
     "Voting closes when the countdown hits zero. No changing your vote!",
     "Most votes gets sent out the <b>airlock</b>. A tie or Skip means no one leaves."]}
 ];
@@ -976,6 +1172,8 @@ function goRhythm(){
   $("emergBtn").classList.toggle("pulse", !!G.played[G.idx]);
   $("prevRh").disabled = G.idx <= 0;
   updatePlayBtn();
+  publish("rhythm");
+  checkSos();
 }
 function togglePlay(){
   if (PB){ stopPlayback(); return; }
@@ -998,39 +1196,72 @@ $("nextRh").onclick = function(){ stopPlayback(true); G.idx++; saveGame(); goRhy
 $("emergBtn").onclick = function(){ startMeeting(); };
 
 /* ======================= MEETING ======================= */
-var MT = null; // {step, picks:[no], votes:{}, timer}
-function startMeeting(){
-  stopPlayback(true);
-  MT = {step:"pick", picks:[], votes:{}, timer:null, left:0};
-  var al = $("alarm"); $("bellSvg").innerHTML = bellArt(); $("alarmWho").textContent = "Round " + G.round;
+var MT = null; // {step, mid, picks:[no], votes:{}, dev:{}, nomCounts:{}, timer, left}
+function newMid(){ return "m" + G.round + "_" + randTok(5); }
+function startMeeting(caller){
+  stopPlayback(true); hideSos();
+  MT = {step:"pick", mid:newMid(), picks:[], votes:{}, dev:null, nomCounts:null, timer:null, left:0, caller:caller || 0};
+  var al = $("alarm"); $("bellSvg").innerHTML = bellArt();
+  $("alarmWho").textContent = caller ? "Called by " + pName(caller) : "Round " + G.round;
   al.className = "alarm"; void al.offsetWidth; al.className = "alarm show";
   sfx("siren");
+  publish("meeting");
   var done = false;
-  function go(){ if (done) return; done = true; al.className = "alarm"; renderMeeting(); show("meeting"); }
+  function go(){
+    if (done) return; done = true; al.className = "alarm";
+    if (liveReady()) startNominate(); else { renderMeeting(); publish("pick"); }
+    show("meeting");
+  }
   al.onclick = go; setTimeout(go, 2800);
+}
+function startNominate(){
+  MT.step = "nominate"; MT.left = G.nom || 20; renderMeeting(); publish("nominate");
+  runTimer(MT.left, closeNominations, true);
+}
+function closeNominations(){
+  clearTimer(); sfx("close");
+  MT.step = "counting"; renderMeeting();
+  pollNow().then(function(){
+    var cnt = {}, alive = G.players.filter(function(p){ return p.alive; }).map(function(p){ return p.no; });
+    Object.keys(LV.noms || {}).forEach(function(v){ var t = LV.noms[v]; if (alive.indexOf(+v) >= 0 && alive.indexOf(t) >= 0) cnt[t] = (cnt[t] || 0) + 1; });
+    MT.nomCounts = cnt;
+    MT.picks = Object.keys(cnt).map(Number).sort(function(a, b){ return (cnt[b] - cnt[a]) || (a - b); }).slice(0, G.sus);
+    MT.step = "pick"; renderMeeting(); publish("pick");
+  });
 }
 function clearTimer(){ if (MT && MT.timer){ clearInterval(MT.timer); MT.timer = null; } }
 function pById(no){ for (var i = 0; i < G.players.length; i++) if (G.players[i].no === no) return G.players[i]; return null; }
 function pName(no){ var p = pById(no); return G.numeric ? "#" + no : (p ? p.name : "#" + no); }
 var HANDS = ["☝️","✌️","3️⃣","4️⃣"];
+function aliveNos(){ return G.players.filter(function(p){ return p.alive; }).map(function(p){ return p.no; }); }
+function countIn(map){ var a = aliveNos(), n = 0; Object.keys(map || {}).forEach(function(k){ if (a.indexOf(+k) >= 0) n++; }); return n; }
 function renderMeeting(){
   $("hud2").innerHTML = hudHTML();
   var b = $("meetBody"), L = "ABCD", h = "";
-  if (MT.step === "pick"){
-    h += '<div class="steptitle">Who\'s sus? <span class="muted" style="font-size:.6em">Tap up to ' + G.sus + " suspects</span></div>";
+  if (MT.step === "nominate" || MT.step === "counting"){
+    h += '<div class="steptitle">Who\'s most sus?</div><div class="center" style="font-size:1.3em">Nominate someone on your iPad!</div>';
+    if (MT.step === "nominate") h += '<div class="bigtimer' + (MT.left <= 5 ? " hot" : "") + '" id="mTimer">' + fmtTime(MT.left) + "</div>";
+    else h += '<div class="bigtimer">…</div>';
+    h += '<div class="nomcount" id="liveCount">' + nomCountText() + "</div>";
+    h += '<div class="center muted">The ' + G.sus + " most-nominated players become the suspects. No iPad? Tell your teacher who you think it is.</div>";
+    h += '<div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary big" id="mNomClose"' + (MT.step === "counting" ? " disabled" : "") + '>Close nominations →</button><button class="btn" id="mNomSkip">Skip: I\'ll pick</button><button class="btn" id="mCancel">Cancel meeting</button></div>';
+  } else if (MT.step === "pick"){
+    var nc = MT.nomCounts;
+    h += '<div class="steptitle">Who\'s sus? <span class="muted" style="font-size:.6em">' + (nc ? "Top nominations are picked. Tap to change (up to " + G.sus + ")" : "Tap up to " + G.sus + " suspects") + "</span></div>";
     h += '<div class="sus-grid">' + G.players.filter(function(p){ return p.alive; }).map(function(p){
-      var ix = MT.picks.indexOf(p.no);
-      return '<button class="pbtn' + (ix >= 0 ? " sel" : "") + '" data-no="' + p.no + '"><span class="no">' + p.no + "</span>" + (G.numeric ? "" : esc(p.name)) + (ix >= 0 ? '<span class="tag">' + L[ix] + "</span>" : "") + "</button>";
+      var ix = MT.picks.indexOf(p.no), c = nc && nc[p.no];
+      return '<button class="pbtn' + (ix >= 0 ? " sel" : "") + '" data-no="' + p.no + '"><span class="no">' + p.no + "</span>" + (G.numeric ? "" : esc(p.name)) + (ix >= 0 ? '<span class="tag">' + L[ix] + "</span>" : "") + (c ? '<span class="nombadge">' + c + " nom" + (c === 1 ? "" : "s") + "</span>" : "") + "</button>";
     }).join("") + "</div>";
+    if (nc && !MT.picks.length) h += '<div class="center warn" style="margin-top:8px">No nominations came in. Pick the suspects yourself.</div>';
     h += '<div class="row" style="justify-content:center;margin-top:14px">' +
       '<button class="btn primary big" id="mDefend"' + (MT.picks.length < 1 ? " disabled" : "") + ">Start defense (" + G.def + "s) →</button>" +
       '<button class="btn" id="mVoteNow"' + (MT.picks.length < 1 ? " disabled" : "") + ">Skip to vote</button>" +
       '<button class="btn" id="mCancel">Cancel meeting</button></div>';
-  } else if (MT.step === "defense" || MT.step === "vote" || MT.step === "tally"){
-    var title = MT.step === "defense" ? "Defend yourselves!" : MT.step === "vote" ? "VOTE NOW!" : "Count the votes";
+  } else if (MT.step === "defense" || MT.step === "vote" || MT.step === "tally" || MT.step === "tallywait"){
+    var title = MT.step === "defense" ? "Defend yourselves!" : MT.step === "vote" ? "VOTE NOW!" : MT.step === "tallywait" ? "Counting the votes…" : "The votes are in";
     h += '<div class="steptitle">' + title + "</div>";
-    if (MT.step !== "tally") h += '<div class="bigtimer' + (MT.left <= 5 ? " hot" : "") + '" id="mTimer">' + fmtTime(MT.left) + "</div>";
-    if (MT.step === "vote") h += '<div class="center muted" style="font-size:1.2em">Voting closes when the countdown hits zero!</div>';
+    if (MT.step === "defense" || MT.step === "vote") h += '<div class="bigtimer' + (MT.left <= 5 ? " hot" : "") + '" id="mTimer">' + fmtTime(MT.left) + "</div>";
+    if (MT.step === "vote") h += '<div class="center muted" style="font-size:1.2em">' + (G.live ? "Vote on your iPad. No iPad? Hold up your hand!" : "Voting closes when the countdown hits zero!") + "</div>" + (G.live ? '<div class="nomcount" id="liveCount">' + voteCountText() + "</div>" : "");
     var opts = MT.picks.map(function(no, i){ return {key:String(no), letter:L[i], hand:HANDS[i], fingers:(i + 1) + (i ? " fingers" : " finger"), name:pName(no), no:no}; });
     opts.push({key:"skip", letter:"SKIP", hand:"✊", fingers:"fist", name:"Skip", no:0});
     var lead = MT.step === "tally" ? leader() : null;
@@ -1051,16 +1282,19 @@ function renderMeeting(){
       else if (lead.key === "skip") msg = "Skip wins, so no one is ejected.";
       else msg = "Most votes: <b>" + esc(pName(+lead.key)) + "</b>";
       var total = 0; for (var k in MT.votes) total += MT.votes[k];
-      h += '<div class="center" style="font-size:1.25em;margin:4px 0 10px">' + msg + ' <span class="muted">(' + total + " votes counted · " + aliveCount() + " players)</span></div>";
+      var devN = 0; if (MT.dev) for (var k2 in MT.dev) devN += MT.dev[k2];
+      h += '<div class="center" style="font-size:1.25em;margin:4px 0 10px">' + msg + ' <span class="muted">(' + total + " votes" + (MT.dev ? ", " + devN + " from iPads" : "") + " · " + aliveCount() + " players)</span></div>";
       h += '<div class="row" style="justify-content:center">' +
         (!tie && lead.key !== "skip" ? '<button class="btn danger big" data-ej="' + lead.key + '">🚀 Eject ' + esc(pName(+lead.key)) + "</button>" : "") +
         '<button class="btn big" id="mNoEject">No one ejected</button><button class="btn" id="mRevote">Re-vote</button></div>' +
-        '<div class="center muted" style="margin-top:8px">Not counting? Just tap the red Eject button under the person with the most hands.</div>';
+        '<div class="center muted" style="margin-top:8px">' + (MT.dev ? "Add hand votes from students without an iPad with + and −." : "Not counting? Just tap the red Eject button under the person with the most hands.") + "</div>";
     }
   }
   b.innerHTML = h;
   wireMeeting();
 }
+function nomCountText(){ var a = aliveNos().length; return countIn(LV.noms) + " of " + a + " nominated"; }
+function voteCountText(){ var a = aliveNos().length; return countIn(LV.votes) + " of " + a + " voted"; }
 function fmtTime(s){ s = Math.max(0, Math.ceil(s)); return s >= 60 ? Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2) : String(s); }
 function leader(){
   var best = -1, keys = [], all = MT.picks.map(String).concat(["skip"]);
@@ -1080,26 +1314,46 @@ function runTimer(sec, onDone, beep){
   }, 100);
   MT.end = end;
 }
-function startDefense(){ MT.step = "defense"; MT.left = G.def; renderMeeting(); runTimer(G.def, function(){ sfx("beep"); startVote(); }, false); renderMeeting(); }
-function startVote(){ clearTimer(); MT.step = "vote"; MT.left = G.vote; renderMeeting(); sfx("beep"); runTimer(G.vote, function(){ sfx("close"); MT.step = "tally"; renderMeeting(); }, true); renderMeeting(); }
+function startDefense(){ MT.step = "defense"; MT.left = G.def; renderMeeting(); runTimer(G.def, function(){ sfx("beep"); startVote(); }, false); renderMeeting(); publish("defense"); }
+function startVote(){
+  clearTimer(); MT.step = "vote"; MT.left = G.vote; MT.dev = null; MT.votes = {}; LV.votes = {};
+  renderMeeting(); sfx("beep");
+  runTimer(G.vote, closeVote, true); renderMeeting(); publish("vote");
+}
+function closeVote(){
+  clearTimer(); sfx("close");
+  if (!G.live){ MT.step = "tally"; renderMeeting(); publish("tally"); return; }
+  MT.step = "tallywait"; renderMeeting(); publish("tally");
+  setTimeout(function(){
+    pollNow().then(function(){
+      var dev = {}, a = aliveNos(), ok = MT.picks.map(String).concat(["skip"]);
+      Object.keys(LV.votes || {}).forEach(function(v){ var c = String(LV.votes[v]); if (a.indexOf(+v) >= 0 && ok.indexOf(c) >= 0) dev[c] = (dev[c] || 0) + 1; });
+      MT.dev = LV.ok ? dev : null;
+      MT.votes = {}; for (var k in dev) MT.votes[k] = dev[k];
+      MT.step = "tally"; renderMeeting();
+    });
+  }, 1200);
+}
 function wireMeeting(){
   var b = $("meetBody");
   b.onclick = function(e){
-    var t = e.target.closest ? e.target.closest("button") : null; if (!t) return;
+    var t = e.target.closest ? e.target.closest("button") : null; if (!t || t.disabled) return;
     var no = t.getAttribute("data-no"), up = t.getAttribute("data-up"), dn = t.getAttribute("data-dn"), ej = t.getAttribute("data-ej");
-    if (no){ no = +no; var ix = MT.picks.indexOf(no); if (ix >= 0) MT.picks.splice(ix, 1); else if (MT.picks.length < G.sus) MT.picks.push(no); else { toast("Up to " + G.sus + " suspects. Tap one to remove it."); return; } sfx("tap"); renderMeeting(); return; }
+    if (no){ no = +no; var ix = MT.picks.indexOf(no); if (ix >= 0) MT.picks.splice(ix, 1); else if (MT.picks.length < G.sus) MT.picks.push(no); else { toast("Up to " + G.sus + " suspects. Tap one to remove it."); return; } sfx("tap"); renderMeeting(); publish("pick"); return; }
     if (up){ MT.votes[up] = (MT.votes[up] || 0) + 1; sfx("tap"); renderMeeting(); return; }
     if (dn){ MT.votes[dn] = Math.max(0, (MT.votes[dn] || 0) - 1); renderMeeting(); return; }
     if (ej){ doEject(+ej); return; }
     switch (t.id){
+      case "mNomClose": closeNominations(); break;
+      case "mNomSkip": clearTimer(); MT.nomCounts = null; MT.step = "pick"; renderMeeting(); publish("pick"); break;
       case "mDefend": startDefense(); break;
       case "mVoteNow": startVote(); break;
       case "mCancel": clearTimer(); MT = null; goRhythm(); break;
-      case "mPause": if (MT.timer){ clearTimer(); renderMeeting(); } else { runTimer(MT.left, function(){ sfx("beep"); startVote(); }, false); renderMeeting(); } break;
-      case "mAdd": if (MT.timer){ var l = MT.left + 15; runTimer(l, function(){ sfx("beep"); startVote(); }, false); } else MT.left += 15; renderMeeting(); break;
+      case "mPause": if (MT.timer){ clearTimer(); renderMeeting(); publish("defense", {paused:true}); } else { runTimer(MT.left, function(){ sfx("beep"); startVote(); }, false); renderMeeting(); publish("defense"); } break;
+      case "mAdd": if (MT.timer){ var l = MT.left + 15; runTimer(l, function(){ sfx("beep"); startVote(); }, false); publish("defense"); } else { MT.left += 15; publish("defense", {paused:true}); } renderMeeting(); break;
       case "mToVote": startVote(); break;
-      case "mToTally": clearTimer(); sfx("close"); MT.step = "tally"; renderMeeting(); break;
-      case "mRevote": MT.votes = {}; startVote(); break;
+      case "mToTally": closeVote(); break;
+      case "mRevote": MT.mid = newMid(); startVote(); break;
       case "mNoEject": doEject(0); break;
     }
   };
@@ -1112,6 +1366,7 @@ function doEject(no){
   var crew = crewLeft(), il = impsLeft();
   if (il === 0) G.over = "crew"; else if (crew < G.thr) G.over = "imp";
   saveGame(); MT = null;
+  publish("eject", {ej:{no:no, name:no ? pName(no) : "", imp:G.reveal && no ? imps.indexOf(no) >= 0 : null, left:G.reveal ? il : null}, over:G.over});
   // ejection scene
   var ej = $("eject"), txt = $("ejectTxt"), btn = $("ejectGo");
   $("floater").innerHTML = no ? raven(colorFor(no)) : "";
@@ -1140,6 +1395,97 @@ function typeOut(el, s, cb){
 }
 $("ejectGo").onclick = function(){ $("eject").className = "eject"; if (G.over) showEnd(); else goRhythm(); };
 
+/* ======================= LIVE (board side) ======================= */
+var LV = freshLV();
+function freshLV(){ return {ok:false, tried:false, fails:0, seen:[], joined:[], sos:{}, votes:{}, noms:{}, at:0}; }
+function randTok(n){ var a = "abcdefghijkmnpqrstuvwxyz23456789", s = ""; var r = new Uint32Array(n); (window.crypto || window.msCrypto).getRandomValues(r); for (var i = 0; i < n; i++) s += a[r[i] % a.length]; return s; }
+function relayUrl(){ return load("sus.relay", "") || RELAY_URL; }
+function withTimeout(pr, ms){ return new Promise(function(res, rej){ var t = setTimeout(function(){ rej(new Error("timeout")); }, ms); pr.then(function(v){ clearTimeout(t); res(v); }, function(e){ clearTimeout(t); rej(e); }); }); }
+function relayCall(params, url){
+  url = url || (G && G.relay) || relayUrl();
+  if (!url) return Promise.resolve(null);
+  var q = Object.keys(params).map(function(k){ return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]); }).join("&");
+  return withTimeout(fetch(url + (url.indexOf("?") >= 0 ? "&" : "?") + q, {cache:"no-store", redirect:"follow"}).then(function(r){ return r.json(); }), 9000).catch(function(){ return null; });
+}
+function relayPost(body){
+  var url = G && G.relay; if (!url) return Promise.resolve(null);
+  return withTimeout(fetch(url, {method:"POST", body:JSON.stringify(body), redirect:"follow"}).then(function(r){ return r.json(); }), 9000).catch(function(){ return null; });
+}
+function liveReady(){ return !!(G && G.live && LV.ok && LV.seen.length > 0); }
+function liveText(){
+  if (!LV.tried) return "📶 connecting…";
+  if (!LV.ok) return "📶 iPads offline: use hands";
+  return "📶 " + LV.seen.length + " of " + aliveNos().length + " iPads";
+}
+function paintLive(){
+  var els = document.querySelectorAll(".livebadge");
+  for (var i = 0; i < els.length; i++){ els[i].textContent = liveText(); els[i].className = "livebadge" + (LV.tried ? (LV.ok ? " ok" : " bad") : ""); }
+  var lc = $("liveCount");
+  if (lc && MT){ if (MT.step === "nominate" || MT.step === "counting") lc.textContent = nomCountText(); else if (MT.step === "vote") lc.textContent = voteCountText(); }
+  if (current === "lobby") renderLobbyRoster();
+}
+var pubBusy = false, pubNext = null, lastPhase = "";
+function publish(phase, extra){
+  if (!G || !G.live) return;
+  lastPhase = phase;
+  var names = {}; G.players.forEach(function(p){ names[p.no] = G.numeric ? "#" + p.no : p.name; });
+  var r = curRh();
+  var d = {v:1, phase:phase, round:G.round, rh:r ? r.name : "", alive:aliveNos(), names:names, k:G.k, reveal:G.reveal, n:G.n,
+           mid:MT ? MT.mid : "", sus:MT ? MT.picks.slice() : [], left:MT ? Math.max(0, Math.round(MT.left)) : 0, over:G.over || null};
+  if (extra) for (var k in extra) d[k] = extra[k];
+  if (phase === "end") d.imps = impSet().map(function(no){ return names[no]; });
+  pubNext = d; flushPub();
+}
+function flushPub(){
+  if (pubBusy || !pubNext) return;
+  var d = pubNext; pubNext = null; pubBusy = true;
+  relayPost({a:"host", r:G.code, s:G.secret, d:d}).then(function(res){
+    pubBusy = false;
+    if (res && res.err === "host") toast("Another board is running this game code.");
+    if (!res || !res.ok){ if (!pubNext) setTimeout(function(){ if (!pubNext && lastPhase === d.phase){ pubNext = d; flushPub(); } }, 3000); }
+    flushPub();
+  });
+}
+var pollT = null, pollBusy = false;
+function pollNow(){
+  if (!G || !G.live) return Promise.resolve();
+  pollBusy = true;
+  return relayCall({a:"poll", r:G.code, s:G.secret, n:G.n, m:MT ? MT.mid : ""}).then(function(res){
+    pollBusy = false; LV.tried = true;
+    if (res && res.ok){ LV.ok = true; LV.fails = 0; LV.seen = res.seen; LV.joined = res.joined; LV.sos = res.sos || {}; LV.votes = res.votes || {}; LV.noms = res.noms || {}; LV.at = Date.now(); }
+    else { LV.fails++; if (LV.fails >= 2) LV.ok = false; }
+    paintLive(); checkSos();
+  });
+}
+function pollLoop(){
+  clearTimeout(pollT);
+  var active = G && G.live && !G.over && ["lobby","rules","rhythm","meeting"].indexOf(current) >= 0;
+  var fast = MT && (MT.step === "nominate" || MT.step === "vote");
+  if (active && !pollBusy) pollNow();
+  pollT = setTimeout(pollLoop, active ? (fast ? 1500 : 3000) : 4000);
+}
+/* emergency requests from iPads */
+var sosShown = 0;
+function checkSos(){
+  if (!G || !G.live || current !== "rhythm" || MT) return;
+  if (sosShown && !G.sosSeen[sosShown]) return;
+  var a = aliveNos(), next = 0;
+  Object.keys(LV.sos || {}).forEach(function(k){ var no = +k; if (!next && !G.sosSeen[no] && a.indexOf(no) >= 0) next = no; });
+  if (!next){ hideSos(); return; }
+  sosShown = next; sfx("beep");
+  $("sosTxt").textContent = "🚨 " + pName(next) + " wants an Emergency Meeting!";
+  $("sosBar").className = "sosbar show";
+}
+function hideSos(){ $("sosBar").className = "sosbar"; sosShown = 0; }
+$("sosGo").onclick = function(){ var no = sosShown; G.sosSeen[no] = 1; saveGame(); hideSos(); startMeeting(no); };
+$("sosNo").onclick = function(){ G.sosSeen[sosShown] = 1; saveGame(); hideSos(); checkSos(); };
+/* setup: relay settings */
+$("relaySave").onclick = function(){ var u = $("relayUrl").value.trim(); if (u && !/^https:\/\//.test(u) && !/^http:\/\/127\.0\.0\.1/.test(u)) { $("relayMsg").textContent = "That should start with https://"; return; } save("sus.relay", u === RELAY_URL ? "" : u); $("relayMsg").textContent = "Saved."; };
+$("relayTest").onclick = function(){
+  var u = $("relayUrl").value.trim(); $("relayMsg").textContent = "Testing…";
+  relayCall({a:"ping"}, u).then(function(r){ $("relayMsg").textContent = r && r.ok ? "✓ Connected." : "✗ Couldn't reach it. Check the link and that the web app's access is set to Anyone."; });
+};
+
 /* ======================= END ======================= */
 function showEnd(){
   stopPlayback(true);
@@ -1157,12 +1503,13 @@ function showEnd(){
   $("endUndo").onclick = function(){ undoEject(); };
   if (win === "crew" || win === "imp") sfx("win");
   show("end");
+  publish("end");
 }
 function undoEject(){
   if (!G || !G.hist.length){ toast("Nothing to undo."); return; }
   var last = G.hist.pop(), p = pById(last.no); if (p) p.alive = true;
   G.round = Math.max(1, G.round - 1); G.idx = last.rh; G.over = null; saveGame();
-  toast("Brought back " + pName(last.no) + "."); goRhythm();
+  toast(endDot("Brought back " + pName(last.no))); MT = null; goRhythm();
 }
 
 /* ======================= MENU ======================= */
@@ -1374,10 +1721,10 @@ $("bnLoad").onclick = function(){
 };
 
 window.SUS = {shortNames:shortNames, encodeCode:encodeCode, decodeCode:decodeCode, imposters:imposters, parseRhythm:parseRhythm, countLabel:countLabel, DEFAULT_RHYTHMS:DEFAULT_RHYTHMS, cleanCode:cleanCode, VERSION:VERSION,
-  state:function(){ return G; }, meeting:function(){ return MT; }};
-applyTheme(); applySound(); renderHome();
-var qs = /[?&]role=([^&]*)/.exec(location.search);
-if (qs) openRole(decodeURIComponent(qs[1]));
+  state:function(){ return G; }, meeting:function(){ return MT; }, live:function(){ return LV; }, player:function(){ return SP; }};
+applyTheme(); applySound(); renderHome(); pollLoop();
+var qs = /[?&]role=([^&]*)/.exec(location.search), qx = /[?&]x=([^&]*)/.exec(location.search);
+if (qs) openRole(decodeURIComponent(qs[1]), qx ? decodeURIComponent(qx[1]) : "");
 else if (/[?&]teacher/.test(location.search)) openSetup();
 else show("home");
 })();
