@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.2 — 2026-11-20
+- Home title is now level (no tilt). The bounce animation is unchanged.
+
 ## 1.0.1 — 2026-11-20
 - Bigger, stylized "Sus Rhythms" title on the home screen: 3D outlined letters that bounce across the word like a playhead. On narrow screens the two words stack.
 
