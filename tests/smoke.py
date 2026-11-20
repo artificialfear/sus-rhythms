@@ -194,6 +194,49 @@ with sync_playwright() as p:
     if SHOTS: pg.screenshot(path=f'{SHOTS}/17-editor.png')
     pg.click('#edDone')
 
+
+    # ---- Band Ninja roster pull (Google sign-in + Sheets mocked; fictional students)
+    bctx = b.new_context(viewport={'width': 1600, 'height': 900})
+    bctx.add_init_script("""
+      window.__gsi = 0;
+      window.google = {accounts:{oauth2:{
+        initTokenClient: function(o){ return {requestAccessToken: function(){ window.__gsi++; setTimeout(function(){ o.callback({access_token:'tok', expires_in:3600}); }, 10); }}; },
+        revoke: function(){} }}};
+      localStorage.setItem('partCopier.v1', JSON.stringify({bn:{clientId:'123-abc.apps.googleusercontent.com', sheetId:'x', tab:'Part Copier Roster'}}));
+    """)
+    seen_ranges = []
+    def sheets(route):
+        url = route.request.url
+        seen_ranges.append(url)
+        ok(route.request.headers.get('authorization') == 'Bearer tok', 'Sheets request carries the token')
+        fake = {
+          '1st': ['Rivera, Sam', 'Okafor, Jade', 'Rivers, Sam', 'Nguyen, Ana'],
+          '3rd': ['Park, Lee', 'Stone, Rae', 'Hill, Max', 'Moss, Ivy', 'Cole, Ty', 'Day, Bo'],
+          '4th': ['Fox, Ada', 'Gray, Eli', 'Kent, Mo', 'Lane, Zoe', 'Reed, Al', 'Shaw, Kim', 'Vance, Oz'],
+          '6th': [], '7th': ['Wu, Lin', 'Yates, Cal', 'Zane, Pia', 'Ames, Jo', 'Bell, Ari'],
+        }
+        vr = [{'values': [[n] for n in fake[k]]} if fake[k] else {} for k in ['1st','3rd','4th','6th','7th']]
+        import json
+        route.fulfill(status=200, content_type='application/json', body=json.dumps({'valueRanges': vr}))
+    bctx.route('https://sheets.googleapis.com/**', sheets)
+    bp = bctx.new_page(); bp.on('pageerror', lambda e: errors.append(str(e)))
+    bp.goto(URL + '?teacher'); bp.wait_for_selector('#setup.active')
+    ok(bp.input_value('#bnClient').startswith('123-abc'), 'client ID picked up from Part Copier on the same site')
+    bp.click('#bnLoad'); bp.wait_for_function("document.getElementById('bnMsg').textContent.indexOf('Loaded')>=0", timeout=5000)
+    msg = bp.inner_text('#bnMsg'); print('   ', msg)
+    ok('1st 4' in msg and '3rd 6' in msg and '4th 7' in msg and 'kept old list' in msg, 'all blocks loaded in one go')
+    ok(len(seen_ranges) == 1 and '3rd%20Block' in seen_ranges[0] and '4th%20Block' in seen_ranges[0], 'one batch request for all block tabs')
+    r1 = bp.input_value('#roster').split('\n')
+    ok(r1 == ['Ana N.', 'Jade O.', 'Sam Rivera', 'Sam Rivers'], f'names shortened + duplicates told apart: {r1}')
+    ok('from Band Ninja just now' in bp.inner_text('#bnInfo'), 'source note shown')
+    bp.select_option('#clsSel', 'b4')
+    ok(bp.input_value('#roster').split('\n')[0] == 'Ada F.' and len(bp.input_value('#roster').split('\n')) == 7, '4th Block got its own list')
+    bp.select_option('#clsSel', 'b3')
+    ok(len(bp.input_value('#roster').split('\n')) == 6, '3rd Block separate from 4th')
+    bp.click('#bnLoad'); bp.wait_for_function("document.getElementById('bnMsg').textContent.indexOf('Loaded')>=0", timeout=5000)
+    ok(bp.evaluate('window.__gsi') == 1, 'second load reuses the sign-in (no new popup)')
+    if SHOTS: bp.screenshot(path=f'{SHOTS}/21-bn-loaded.png', full_page=True)
+    bctx.close()
     # ---- student role page (iPad width, separate device)
     sctx = b.new_context(viewport={'width': 820, 'height': 1180}, has_touch=True)
     sp = sctx.new_page(); sp.on('pageerror', lambda e: errors.append(str(e)))

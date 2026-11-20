@@ -27,6 +27,15 @@ This is the web version of Mat's "Among Us Rhythm Game" slideshow, his social-de
 - Sounds are all Web Audio synth (click, clap, siren, beeps, whoosh), so there are no audio files.
 - ViewBoard-safe: no flex `gap`, `inset`, `aspect-ratio`, 4/8-digit hex, `?.` or `??` (the smoke test checks these).
 
+## Band Ninja roster pull (v1.1.0)
+- Setup → "Load all blocks from Band Ninja": one Sheets `values:batchGet` for `'1st Block'!A2:A200`, 3rd, 4th, 6th and 7th (column A = "Last, First"). These are the per-block tabs of **Band Ninja Tracker 2026-2027** (`1SMjkABPZx4e1wHdsZ3aRcmyw17SfEYueodGK_UQICIw`, default sheet ID; the sheet is private, so the ID alone exposes nothing). No sheet changes were needed. Mat picked "add a block column", but the per-block tabs already split 3rd from 4th.
+- Google Identity Services token client (loaded from accounts.google.com; it can't be bundled), scope `spreadsheets.readonly` only. Token in sessionStorage `sus.bnTok` (~1 h). Config in `sus.bn` {clientId, sheetId, consented}.
+- Client ID: the same OAuth client as Part Copier (Cloud project "Part Copier"), which already authorizes the artificialfear.github.io origin. On a device that has used Part Copier, the ID is read from `localStorage['partCopier.v1'].bn.clientId` (same origin). Otherwise paste it once under "Band Ninja connection".
+- `shortNames()`: "Last, First" → "First L."; any collisions extend the last name, letter by letter, up to the full name; exact duplicates get " (2)". Sorted A–Z.
+- An empty tab keeps the old list. Absent marks are kept for names that are still on the roster. A hand edit clears the "came from Band Ninja" note.
+- Test: smoke.py mocks `google.accounts.oauth2` and routes sheets.googleapis.com with fictional names.
+- Unverified: whether the GIS sign-in popup works in the ViewBoard's browser. If it doesn't, load the rosters on a laptop and play there, or paste the names.
+
 ## Device storage (localStorage, per device)
 `sus.classes` (rosters, absent list, rules, rhythm picks per class), `sus.cls`, `sus.rhythms`, `sus.game` (game in progress; resume from Setup), `sus.view`, `sus.theme`, `sus.sound`, `sus.lock.<CODE>` (student devices). Rhythms move between devices with Export/Import in the editor. Rosters stay on the ViewBoard only, and no student names are in the repo.
 
@@ -36,4 +45,3 @@ This is the web version of Mat's "Among Us Rhythm Game" slideshow, his social-de
 - Imposters don't see who the other imposters are. That could be an option.
 - Optional per-class win threshold scaling (e.g. "half the crew").
 - 6/8 and triplets in the parser and counts.
-- Possible Band Ninja roster import instead of pasting names.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 — 2026-11-20
+- New **Load all blocks from Band Ninja** button in Setup. After a Google sign-in, it fills the 1st, 3rd, 4th, 6th and 7th Block rosters from the Band Ninja Tracker in one step. 3rd and 4th Block each get their own list.
+- Names show as "First L." (first name + last initial), sorted A–Z. When two students would look the same, more of the last name is shown.
+- Uses the same Google sign-in as Part Copier. It only reads the sheet and never changes it.
+
 ## 1.0.3 — 2026-11-20
 - Home title is now centered on the page. It used to sit off to the right on wide screens.
 
